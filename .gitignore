@@ -1,0 +1,7 @@
+aws-credentials.json
+.DS_Store
+venv/
+.vscode/
+notes.py
+deployment_playground.py
+
