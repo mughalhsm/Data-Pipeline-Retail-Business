@@ -68,7 +68,3 @@ def create_date_dim_dataframe():
     df['month_name'] = df['date_id'].dt.strftime("%B")
     df['quarter'] = df['date_id'].dt.quarter
     return df
-
-date_dim_df = create_date_dim_dataframe()
-
-convert_data_frame_to_parquet(date_dim_df, 'dim_date')
