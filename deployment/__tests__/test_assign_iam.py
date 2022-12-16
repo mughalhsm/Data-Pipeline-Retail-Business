@@ -98,3 +98,10 @@ def test_if_a_cloudwatch_policy_exists_get_policy_information_and_return_in_same
     initial = permissions.create_cloudwatch_logging_policy("test-lambda")
     result = permissions.create_cloudwatch_logging_policy("test-lambda")
     assert initial['Policy']['Arn'] == result['Policy']['Arn']
+
+@mock_iam
+def test_if_a_role_exists_get_role_information_and_return_in_same_format():
+    permissions = Assign_iam()
+    initial = permissions.create_lambda_role(role_name='test-role')
+    result = permissions.create_lambda_role(role_name='test-role')
+    assert initial['Role']['Arn'] == result['Role']['Arn']
