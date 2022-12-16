@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - main
+      - github-actions-deploy-branch
+
+jobs:
+  create-buckets-and-lambdas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4.3.1
+        with: 
+          python-version: '3.9'
+      - name: install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3
+          pip install pandas
+          # -r deployment/requirements.txt
+          # pip install -e .
+      - name: Execute python script to create buckets on the s3 aws server
+        run: |
+          echo 'Creating buckets'
+          python deployment/run_bucket_creation.py
+      # - name: Initial test run
+      #   run : python -m pytest --import-mode=append
+      # - name: Run tests to ensure lambdas pass
+      #   run: |
+      #     FAILCOUNT=$(PYTHONPATH=$(pwd) pytest | grep failed -i | wc -l)
+      #     echo lambdas failed $FAILCOUT times
+      - name: Use the uploaded lambda zip archives to populate the lambda functions
+        run: |
+          # if [ $FAILCOUNT -le 0 ]; then
+          #   echo 'Assigning lambdas roles and functions'
+            python deployment/run_lambda_creation.py
+          # else 
+          #   echo "Lambdas not assigned due to errors";
+          #   PYTHONPATH=$(pwd) pytest -v | grep FAILED
+          # fi
