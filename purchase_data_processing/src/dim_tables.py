@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import logging
 from botocore.exceptions import ClientError
+from io import StringIO
 
 
 
@@ -20,16 +21,24 @@ def retrieve_table_from_s3_bucket_convert_dataframe(bucket_name, table_name):
                 latest2 = max(page['Contents'], key=lambda x: x['LastModified'])
                 if latest is None or latest2['LastModified'] > latest['LastModified']:
                     latest = latest2
-        s3.download_file(Bucket=bucket_name, Key=latest['Key'], Filename=f'table_files/{table_name}.csv')
+        if latest == None:
+            raise ValueError
+        ## Reads the content of table required
+        s3_object = s3.get_object(Bucket=bucket_name, Key=latest['Key'])
+        csv_string = s3_object['Body'].read().decode('utf-8')
+        ## Converts string into a format that can be used by pandas to convert into dataframe
+        csv_df_input = StringIO(csv_string)
+        ## Converts CSV string (StringIO) into dataframe.
+        table_as_df = pd.read_csv(csv_df_input, sep=',')
     except ClientError as error:
+        raise error
+    except ValueError as error:
+        print(f" '{table_name}' table does NOT exist in this bucket - please check bucket or table name.")
         raise error
     except Exception as e:
         raise e
     else:
-        return pd.read_csv(f'table_files/{table_name}.csv')
-
-x = retrieve_table_from_s3_bucket_convert_dataframe('cees-nc-test-bucket-2', 'design')
-print(x)
+        return table_as_df
 
 
 def create_staff_dim_dataframe(staff_df, department_df):
