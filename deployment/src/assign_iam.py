@@ -13,11 +13,6 @@ class Assign_iam():
     def create_aws_connection(self):
         """Create the lambda client, using secrets obtained from github secrets"""
         try:
-            if 'GITHUB_TOKEN' in os.environ:
-                github_secrets: dict = os.environ['GITHUB_TOKEN']
-                os.environ['AWS_ACCESS_KEY_ID'] = github_secrets['AWS_ACCESS_KEY']
-                os.environ['AWS_SECRET_ACCESS_KEY'] = github_secrets['AWS_SECRET_KEY']
-
             self.iam = boto3.client('iam',
                                    region_name='us-east-1')
         except ClientError as ce:
@@ -25,11 +20,7 @@ class Assign_iam():
             print(error)
             self.errors.append(error)
         except AttributeError as ae:
-            error = "Failed to find attributes 'AWS_ACCESS_KEY' and 'AWS_SECRET_KEY' on key 'GITHUB_TOKEN'"
-            print(error)
-            self.errors.append(error)
-        except KeyError as ke:
-            error = "Failed to find keys 'AWS_ACCESS_KEY' and 'AWS_SECRET_KEY' on key 'GITHUB_TOKEN'"
+            error = "Failed to find attributes 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'"
             print(error)
             self.errors.append(error)
         except Exception as e:

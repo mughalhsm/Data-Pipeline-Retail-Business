@@ -3,21 +3,23 @@ from deployment.src.assign_iam import Assign_iam
 from deployment.src.create_buckets import Create_resources
 from deployment.src.event_handler import Create_events
 
-ingest_lambda_name = "ingest"
-process_payments_lambda_name = "process_payments"
-process_purchases_lambda_name = "process_purchases"
-process_sales_lambda_name = "process_sales"
-upload_lambda_name = "upload"
+testing_prefix = "scott-test-run-1-"
 
-ingest_role = "ingest-role"
-process_payments_role = "process-payments-role"
-process_purchases_role = "process-purchases-role"
-process_sales_role = "process-sales-role"
-warehouse_uploader_role = "warehouse-uploader-role"
+ingest_lambda_name = f"{testing_prefix}ingest"
+process_payments_lambda_name = f"{testing_prefix}process_payments"
+process_purchases_lambda_name = f"{testing_prefix}process_purchases"
+process_sales_lambda_name = f"{testing_prefix}process_sales"
+upload_lambda_name = f"{testing_prefix}upload"
 
-processed_bucket_name = 'processed-bucket'
-ingest_bucket_name = 'ingest-bucket'
-code_bucket_name = 'code-bucket'
+ingest_role = f"{testing_prefix}ingest-role"
+process_payments_role = f"{testing_prefix}process-payments-role"
+process_purchases_role = f"{testing_prefix}process-purchases-role"
+process_sales_role = f"{testing_prefix}process-sales-role"
+warehouse_uploader_role = f"{testing_prefix}warehouse-uploader-role"
+
+processed_bucket_name = f'{testing_prefix}processed-bucket'
+ingest_bucket_name = f'{testing_prefix}ingest-bucket'
+code_bucket_name = f'{testing_prefix}code-bucket'
 
 
 def deploy_lambdas():
@@ -114,10 +116,12 @@ def create_roles(permit: Assign_iam):
 def create_policies(permit: Assign_iam):
     processed_bucket_name = 'processed-bucket'
     ingest_bucket_name = 'ingest-bucket'
+    print("Creating ingest policies")
     permit.create_cloudwatch_logging_policy(lambda_name=ingest_lambda_name)
     permit.create_s3_read_write_policy(
         bucket=ingest_bucket_name, lambda_name=ingest_lambda_name, read=True, write=True)
 
+    print("Creating payments policies")
     permit.create_cloudwatch_logging_policy(
         lambda_name=process_payments_lambda_name)
     permit.create_s3_read_write_policy(
@@ -125,6 +129,7 @@ def create_policies(permit: Assign_iam):
     permit.create_s3_read_write_policy(
         bucket=processed_bucket_name, lambda_name=process_payments_lambda_name, read=True, write=True)
 
+    print("Creating purchases policies")
     permit.create_cloudwatch_logging_policy(
         lambda_name=process_purchases_lambda_name)
     permit.create_s3_read_write_policy(
@@ -132,6 +137,7 @@ def create_policies(permit: Assign_iam):
     permit.create_s3_read_write_policy(
         bucket=processed_bucket_name, lambda_name=process_purchases_lambda_name, read=True, write=True)
 
+    print("Creating sales policies")
     permit.create_cloudwatch_logging_policy(
         lambda_name=process_sales_lambda_name)
     permit.create_s3_read_write_policy(
@@ -139,9 +145,10 @@ def create_policies(permit: Assign_iam):
     permit.create_s3_read_write_policy(
         bucket=processed_bucket_name, lambda_name=process_sales_lambda_name, read=True, write=True)
 
-    permit.create_cloudwatch_logging_policy(lambda_name=upload_lambda_name)
-    permit.create_s3_read_write_policy(
-        bucket=ingest_bucket_name, lambda_name=processed_bucket_name, read=True)
+    # print("Creating warehouse policies")
+    # permit.create_cloudwatch_logging_policy(lambda_name=upload_lambda_name)
+    # permit.create_s3_read_write_policy(
+    #     bucket=ingest_bucket_name, lambda_name=processed_bucket_name, read=True)
 
 
 if __name__ == '__main__':
