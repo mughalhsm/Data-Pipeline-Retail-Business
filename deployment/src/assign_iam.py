@@ -29,6 +29,7 @@ class Assign_iam():
 
     def create_lambda_role(self,role_name:str):
         """Sets up role of passed name, with the ability of a lambda function to assume said role, and saves the arn on a key of the name in roles"""
+        response = ""
         lambda_role_document = '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"},"Action": "sts:AssumeRole"}]}'
         try:
             response = self.iam.create_role(
@@ -65,6 +66,7 @@ class Assign_iam():
     
     def create_cloudwatch_logging_policy(self, lambda_name:str):
         """Creates a cloudwatch policy for having access to the lambda's logger, and saves the arn on a key of the name in policies"""
+        response = ""
         policy_name = f'cloudwatch-policy-{lambda_name}'
         try:
             response = self.iam.create_policy(
@@ -75,8 +77,8 @@ class Assign_iam():
         except ClientError as ce:
             if ce.response['Error']['Code'] == 'EntityAlreadyExistsException':
                 print(f'{policy_name} policy already exists, reading from iam')
-                responses = self.iam.list_policies(Scope='ALL')
-                response = {'Policy':policy for policy in responses['Policies']}
+                responses = self.iam.list_policies(Scope='Local')
+                response = {'Policy':policy for policy in responses['Policies'] if policy['PolicyName'] == policy_name}
             
         self.policy_arns[f'cloudwatch-policy-{lambda_name}'] = response['Policy']['Arn']
         return response
@@ -92,11 +94,11 @@ class Assign_iam():
                 Description=f'Read the ingest bucket policy policy for {lambda_name}'
             )
         except ClientError as ce:
-            if ce.response['Error']['Code'] == 'EntityAlreadyExistsException':
+            if ce.response['Error']['Code'] == 'EntityAlreadyExists':
                 print(f'{policy_name} policy already exists, reading from iam')
-                responses = self.iam.list_policies(Scope='ALL')
-                response = {'Policy':policy for policy in responses['Policies']}
-        self.policy_arns[f's3-{name_modifier}-{bucket}-{lambda_name}'] = response['Policy']['Arn']
+                responses = self.iam.list_policies(Scope='Local')
+                response = {'Policy':policy for policy in responses['Policies'] if policy['PolicyName'] == policy_name}
+        self.policy_arns[policy_name] = response['Policy']['Arn']
         return response
     
 

@@ -83,3 +83,10 @@ def test_attach_custom_policy_adds_the_policy_to_the_appropriate_role():
     assert result['ResponseMetadata']['HTTPStatusCode'] == 200
     result = permissions.iam.list_attached_role_policies(RoleName='test-role')
     assert 's3-read-test-bucket-test-lambda' in [policy['PolicyName'] for policy in result['AttachedPolicies']]
+
+@mock_iam
+def test_if_a_policy_exists_get_policy_information_and_return_in_same_format():
+    permissions = Assign_iam()
+    initial = permissions.create_s3_read_write_policy("test-lambda","test-bucket")
+    result = permissions.create_s3_read_write_policy("test-lambda","test-bucket")
+    assert initial['Policy']['Arn'] == result['Policy']['Arn']
