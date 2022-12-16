@@ -1,9 +1,10 @@
-#run this first
+#This file is invoked within ConnectionLambda to allow ingestion
 import boto3, botocore
 import pandas as pd
 from botocore.exceptions import ClientError
 import datetime
 import time
+import logging
 s3 = boto3.resource('s3')
 bucket_name = 'cees-nc-test-bucket-2'
 prefix = 'Run-tracker'
@@ -15,7 +16,7 @@ def check_input_details_correct():
     else:
         return bucket_name, prefix
 
-# check_input_details_correct()
+
 
 bucket = s3.Bucket(bucket_name)
 def check_bucket(bucket):
@@ -104,7 +105,10 @@ def getting_last_object(bucket_name, prefix):
 
 def check_if_empty_bucket():
     s3 = boto3.client('s3')
-    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix) ## have to specify correctly, otherwise will be creating loads...
+    try:
+        response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix) ## have to specify correctly, otherwise will be creating loads...
+    except ClientError as e:
+        logging.error('Could not list objects', e.response['Error'])
     return response['KeyCount']
 
 # if check_if_empty_bucket() == 0:  
