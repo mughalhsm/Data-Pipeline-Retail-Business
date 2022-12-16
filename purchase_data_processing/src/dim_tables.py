@@ -4,11 +4,13 @@ import json
 import pandas as pd
 import logging
 from botocore.exceptions import ClientError
-from io import StringIO
+from io import StringIO, BytesIO
 
 
 
 def retrieve_table_from_s3_bucket_convert_dataframe(bucket_name, table_name):
+    if table_name == 'purchase order' or table_name == 'purchases' or table_name == 'purchase':
+        table_name = 'purchase_order'
     try:
         s3 = boto3.client('s3')
         paginator = s3.get_paginator( "list_objects_v2" )
@@ -123,7 +125,33 @@ def create_date_dim_dataframe():
         return df
 
 
-def convert_data_frame_to_parquet(dim_table_dataframe, name_of_parquet_file):
-    dim_table_dataframe.to_parquet(f'{name_of_parquet_file}.parquet', engine='fastparquet')
+
+def create_fact_purchase_orders_dataframe(purchase_order_df):
+    try:
+        purchase_order_df['created_date'] = pd.to_datetime(purchase_order_df['created_at']).dt.date
+        purchase_order_df['created_time'] = pd.to_datetime(purchase_order_df['created_at']).dt.time
+        purchase_order_df['last_updated_date'] = pd.to_datetime(purchase_order_df['last_updated']).dt.date
+        purchase_order_df['last_updated_time'] = pd.to_datetime(purchase_order_df['last_updated']).dt.time
+        purchase_order_df = purchase_order_df.drop(['created_at', 'last_updated'], axis=1)
+    except Exception as e:
+        print(e)
+        raise e
+    else:
+        return purchase_order_df
 
 
+def convert_data_frame_to_parquet_and_upload_S3(dim_fact_table_dataframe, bucket_name, filename):
+    out_buffer = BytesIO()
+    dim_fact_table_dataframe.to_parquet(out_buffer)
+    s3 = boto3.client('s3')
+    s3.put_object(Bucket=bucket_name, Key=f"{filename}.parquet", Body=out_buffer.getvalue())
+
+
+
+purchase_df = retrieve_table_from_s3_bucket_convert_dataframe('cees-nc-test-bucket-2', 'purchases')
+fact_purchase_df = create_fact_purchase_orders_dataframe(purchase_df)
+
+convert_data_frame_to_parquet_and_upload_S3(fact_purchase_df, 'hamza-test-bucket-processed-data-will-delete-later', 'fact_purchase_order')
+
+s3 = boto3.client('s3')
+s3.download_file('hamza-test-bucket-processed-data-will-delete-later', 'fact_purchase_order.parquet', 'fact_purchase_order.parquet')
