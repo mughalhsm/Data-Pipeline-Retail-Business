@@ -90,3 +90,11 @@ def test_if_a_policy_exists_get_policy_information_and_return_in_same_format():
     initial = permissions.create_s3_read_write_policy("test-lambda","test-bucket")
     result = permissions.create_s3_read_write_policy("test-lambda","test-bucket")
     assert initial['Policy']['Arn'] == result['Policy']['Arn']
+
+
+@mock_iam
+def test_if_a_cloudwatch_policy_exists_get_policy_information_and_return_in_same_format():
+    permissions = Assign_iam()
+    initial = permissions.create_cloudwatch_logging_policy("test-lambda")
+    result = permissions.create_cloudwatch_logging_policy("test-lambda")
+    assert initial['Policy']['Arn'] == result['Policy']['Arn']
