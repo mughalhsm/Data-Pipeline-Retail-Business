@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - github-actions-deploy-branch
+      - deployment-update-branch
 
 jobs:
   create-buckets-and-lambdas:
@@ -22,7 +22,7 @@ jobs:
       - name: Execute python script to create buckets on the s3 aws server
         run: |
           echo 'Creating buckets'
-          python deployment/run_bucket_creation.py
+          PYTHONPATH=$(pwd) python deployment/run_bucket_creation.py
       # - name: Initial test run
       #   run : python -m pytest --import-mode=append
       # - name: Run tests to ensure lambdas pass
@@ -33,7 +33,7 @@ jobs:
         run: |
           # if [ $FAILCOUNT -le 0 ]; then
           #   echo 'Assigning lambdas roles and functions'
-            python deployment/run_lambda_creation.py
+            PYTHONPATH=$(pwd) python deployment/run_lambda_creation.py
           # else 
           #   echo "Lambdas not assigned due to errors";
           #   PYTHONPATH=$(pwd) pytest -v | grep FAILED
