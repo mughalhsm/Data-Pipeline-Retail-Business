@@ -1,9 +1,10 @@
-#run this first
+#This file is invoked within ConnectionLambda to allow ingestion
 import boto3, botocore
 import pandas as pd
 from botocore.exceptions import ClientError
 import datetime
 import time
+import logging
 s3 = boto3.resource('s3')
 bucket_name = 'cees-nc-test-bucket-2'
 prefix = 'Run-tracker'
@@ -15,7 +16,7 @@ def check_input_details_correct():
     else:
         return bucket_name, prefix
 
-# check_input_details_correct()
+
 
 bucket = s3.Bucket(bucket_name)
 def check_bucket(bucket):
@@ -66,11 +67,11 @@ def increment_run_number(key_to_download, file_name):
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M') ## doesnt need seconds
     print('Downloading file...')
     try:
-        s3client.download_file(Bucket=bucket_name,Key=key_to_download,Filename=f'{file_name}.csv')
+        s3client.download_file(Bucket=bucket_name,Key=key_to_download,Filename=f'/tmp/{file_name}.csv')
     except ClientError as e:
         print(e.response['Error'])
 
-    with open(f'{file_name}.csv') as f:
+    with open(f'/tmp/{file_name}.csv', 'r') as f:
         print('Updating file...')
         df = pd.read_csv(f'{file_name}.csv') 
     try:
@@ -104,8 +105,29 @@ def getting_last_object(bucket_name, prefix):
 
 def check_if_empty_bucket():
     s3 = boto3.client('s3')
-    response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix) ## have to specify correctly, otherwise will be creating loads...
+    try:
+        response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix) ## have to specify correctly, otherwise will be creating loads...
+    except ClientError as e:
+        logging.error('Could not list objects', e.response['Error'])
     return response['KeyCount']
+
+
+def num_track_run_func():
+    if check_if_empty_bucket() == 0:  
+        print('Bucket is empty...')  
+        create_initial_time_stamp_file()   
+    else:
+        print('Bucket is not empty') 
+
+    if check_bucket(bucket)==True: ### This means i have access to the bucket, now we obtain last item which allows us to increment
+        increment = getting_last_object(bucket_name, prefix)
+        print(increment)
+        return increment
+    if increment == None:
+        print('Something is very wrong, check prefix and bucket_name are correct')
+        quit()
+    logging.info('Run number updated successfully, can continue to ingestion')
+    return increment
 
 # if check_if_empty_bucket() == 0:  
 #     print('Bucket is empty...')  
