@@ -37,7 +37,7 @@ class Assign_iam():
                 AssumeRolePolicyDocument = lambda_role_document
             )
         except ClientError as ce:
-            if ce.response['Error']['Code'] == 'EntityAlreadyExistsException':
+            if ce.response['Error']['Code'] == 'EntityAlreadyExists':
                 print(f'{role_name} role already exists, reading from iam')
                 responses = self.iam.list_roles()
                 response = {'Role':role for role in responses['Roles']}
@@ -75,7 +75,7 @@ class Assign_iam():
                 Description=f'Cloudwatch policy for {lambda_name}'
             )
         except ClientError as ce:
-            if ce.response['Error']['Code'] == 'EntityAlreadyExistsException':
+            if ce.response['Error']['Code'] == 'EntityAlreadyExists':
                 print(f'{policy_name} policy already exists, reading from iam')
                 responses = self.iam.list_policies(Scope='Local')
                 response = {'Policy':policy for policy in responses['Policies'] if policy['PolicyName'] == policy_name}
