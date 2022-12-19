@@ -3,8 +3,6 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 import zipfile
-# Pandas import only for obtaining pandas install location
-import pandas
 
 
 class Create_resources():
@@ -43,6 +41,9 @@ class Create_resources():
 
     def assign_bucket_update_event_triggers(self, bucket_name: str, lambda_arn: str, bucket_folders: list):
         """Trigger the appropriate lambda function when a bucket folder has new files added"""
+        if lambda_arn==None or bucket_name==None:
+            print(f'Incomplete parameters for creating trigger')
+            return
         notification_config = {
             'LambdaFunctionConfigurations': [
                 {
@@ -63,6 +64,8 @@ class Create_resources():
                         'Value': folder
                     }
                 )
+        print(f"Applying configurations : {notification_config}")
+        print(f"For {bucket_name}")
         try:
             response = self.s3.put_bucket_notification_configuration(
                 Bucket=bucket_name,
@@ -73,11 +76,12 @@ class Create_resources():
             error = 'Client Error : ' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
+            raise ce
 
-    def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str, pandas_dependency: bool = False):
+    def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str):
         """Using a folder path, lambda name, and destination code bucket, zip the lambda into an archive and upload it to aws s3 bucket"""
         try:
-            zip_directory(folder_path, pandas_dependency)
+            zip_directory(folder_path)
             with open("lambda.zip", "rb") as file:
                 self.s3.upload_fileobj(file, code_bucket, lambda_name+".zip")
         except ClientError as nb:
@@ -87,16 +91,10 @@ class Create_resources():
             raise e
 
 
-def zip_directory(folder_path: str, pandas_dependency: bool = False):
+def zip_directory(folder_path: str,zip_name:str="lambda.zip"):
     """Create a zip file, where the contents are at the top level where they would be with respect for their folder's path"""
-    zip_file = zipfile.ZipFile("lambda.zip", 'w', zipfile.ZIP_DEFLATED)
+    zip_file = zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED)
     zip_walk(folder_path, zip_file, "")
-
-    if pandas_dependency:
-        # -12 as this will always show path to pandas/__init__.py
-        location = pandas.__file__[:-12]
-        zip_walk(location, zip_file, "pandas/")
-        print(f"Zipped pandas from {location}")
 
 
 def zip_walk(folder_path: str, zip_file: zipfile.ZipFile, target_subfolder: str = ""):

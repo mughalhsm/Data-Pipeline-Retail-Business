@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - deployment-credentials-branch
+      - fix-role-naming-convention
 
 jobs:
   create-buckets-and-lambdas:
@@ -16,7 +16,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install boto3
-          pip install pandas
+          pip install pandas -t .
+          pip install pg8000 -t .
+          CURRENTLOC=$(pwd)
+          ls -la
+          echo Zipping dependencies
+          cd pandas
+          echo Zipping from $(pwd) to $(${CURRENTLOC}/pandas.zip)
+          zip -r9 ${CURRENTLOC}/pandas.zip .
+          cd ../pg8000
+          echo Zipping from $(pwd) to $(${CURRENTLOC}/pg8000.zip)
+          zip -r9 ${CURRENTLOC}/pg8000.zip .
           # -r deployment/requirements.txt
           # pip install -e .
       - name: Execute python script to create buckets on the s3 aws server

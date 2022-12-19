@@ -1,6 +1,9 @@
 from deployment.src.create_buckets import Create_resources
 
-testing_prefix = "bosch-test-run-1-"
+testing_prefix = "bosch-test-run-2-"
+
+
+
 def create_buckets():
     ingest_lambda_path = "Ingestion/src"
     process_payments_lambda_path = ""
@@ -14,23 +17,23 @@ def create_buckets():
     create.create_s3_bucket(code_bucket_name)
     create.create_s3_bucket(processed_bucket_name)
     create.create_s3_bucket(ingest_bucket_name)
-    ingest_lambda_name = "ingest"
-    process_payments_lambda_name = "process_payments"
-    process_purchases_lambda_name = "process_purchases"
-    process_sales_lambda_name = "process_sales"
-    upload_lambda_name = "upload"
+    ingest_lambda_name = f"{testing_prefix}ingest"
+    process_payments_lambda_name = f"{testing_prefix}process_payments"
+    process_purchases_lambda_name = f"{testing_prefix}process_purchases"
+    process_sales_lambda_name = f"{testing_prefix}process_sales"
+    upload_lambda_name = f"{testing_prefix}upload"
     if ingest_lambda_path != "":
         create.upload_lambda_function_code(
             code_bucket=code_bucket_name, folder_path=ingest_lambda_path, lambda_name=ingest_lambda_name)
     if process_payments_lambda_path != "":
         create.upload_lambda_function_code(code_bucket=code_bucket_name, folder_path=process_payments_lambda_path,
-                                           lambda_name=process_payments_lambda_name, pandas_dependency=True)
+                                           lambda_name=process_payments_lambda_name)
     if process_purchases_lambda_path != "":
         create.upload_lambda_function_code(code_bucket=code_bucket_name, folder_path=process_purchases_lambda_path,
-                                           lambda_name=process_purchases_lambda_name, pandas_dependency=True)
+                                           lambda_name=process_purchases_lambda_name)
     if process_sales_lambda_path != "":
         create.upload_lambda_function_code(code_bucket=code_bucket_name, folder_path=process_sales_lambda_path,
-                                           lambda_name=process_sales_lambda_name, pandas_dependency=True)
+                                           lambda_name=process_sales_lambda_name)
     if warehouse_uploader_lambda_path != "":
         create.upload_lambda_function_code(
             code_bucket=code_bucket_name, folder_path=warehouse_uploader_lambda_path, lambda_name=upload_lambda_name)

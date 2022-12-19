@@ -2,6 +2,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 import json
+import time
 
 class Assign_iam():
     aws_lambda_execution_policy = 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
@@ -30,7 +31,7 @@ class Assign_iam():
     def create_lambda_role(self,role_name:str):
         """Sets up role of passed name, with the ability of a lambda function to assume said role, and saves the arn on a key of the name in roles"""
         response = ""
-        lambda_role_document = '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"},"Action": "sts:AssumeRole"}]}'
+        lambda_role_document = '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"},"Action": "sts:AssumeRole"}]}'#,{"Effect": "Allow","Action": [ "iam:PassRole"],"Resource": ["arn:aws:iam:::*"]}]}'
         try:
             response = self.iam.create_role(
                 RoleName=role_name,
@@ -40,10 +41,22 @@ class Assign_iam():
             if ce.response['Error']['Code'] == 'EntityAlreadyExists':
                 print(f'{role_name} role already exists, reading from iam')
                 responses = self.iam.list_roles()
-                response = {'Role':role for role in responses['Roles']}
+                response = {'Role':role for role in responses['Roles'] if role_name == role['RoleName']}
+        attempt = 0
+        while response['Role']['RoleName'] != role_name and attempt < 10:
+            time.sleep(1)
+            responses = self.iam.list_roles()
+            response = {'Role':role for role in responses['Roles'] if role_name == role['RoleName']}
+            attempt+=1
+        
         self.role_arns[role_name] = response['Role']['Arn']
         return response
-    
+    def verify_stored_arns(self):
+        return
+            
+        
+        
+        
     def attach_custom_policy(self, role_name:str,policy:str):
         """Attaches the past policy by name to the passed role"""
         if not policy in self.policy_arns:
@@ -116,7 +129,7 @@ def create_cloudwatch_policy_json(lambda_name:str):
                     "Effect": "Allow",
                     "Action": [ "logs:CreateLogStream", "logs:PutLogEvents" ], 
                     "Resource": f"arn:aws:logs:us-east-1::log-group:/aws/lambda/{lambda_name}:*" 
-                } 
+                }
             ] 
         }
     return json.dumps(cloudwatch_log_policy)
@@ -126,7 +139,7 @@ def create_s3_access_policy_json(bucket:str,list:bool=False,get:bool=False,put:b
     policy_document = {
         "Version": "2012-10-17",
         "Statement": []
-    }
+        }
     if list :
         policy_document["Statement"].append({
                 "Effect": "Allow",
