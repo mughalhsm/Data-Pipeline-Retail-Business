@@ -1,10 +1,10 @@
 from deployment.src.create_buckets import Create_resources
 
-testing_prefix = "scott-test-run-1-"
+testing_prefix = "bosch-test-run-1-"
 def create_buckets():
-    ingest_lambda_path = ""
+    ingest_lambda_path = "Ingestion/src"
     process_payments_lambda_path = ""
-    process_purchases_lambda_path = ""
+    process_purchases_lambda_path = "purchase_data_processing/src"
     process_sales_lambda_path = ""
     warehouse_uploader_lambda_path = ""
     code_bucket_name = f'{testing_prefix}code-bucket'

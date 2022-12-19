@@ -3,7 +3,7 @@ from deployment.src.assign_iam import Assign_iam
 from deployment.src.create_buckets import Create_resources
 from deployment.src.event_handler import Create_events
 
-testing_prefix = "scott-test-run-1-"
+testing_prefix = "bosch-test-run-1-"
 
 ingest_lambda_name = f"{testing_prefix}ingest"
 process_payments_lambda_name = f"{testing_prefix}process_payments"
