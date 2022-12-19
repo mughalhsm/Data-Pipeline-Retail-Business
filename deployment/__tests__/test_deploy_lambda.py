@@ -23,3 +23,10 @@ def test_create_lambda_successfully_deploys_when_zip_is_available():
     assert result['ResponseMetadata']['HTTPStatusCode'] == 201
     assert result['FunctionName'] == 'test-lambda'
     assert 'FunctionArn' in result
+
+@mock_lambda
+def test_create_lambda_layer():
+    deploy = Deploy_lambdas()
+    response = deploy.create_lambda_layer(layer_name="pandas-layer",zipfile="pandas.zip",description="test pandas")
+    print(response)
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 201
