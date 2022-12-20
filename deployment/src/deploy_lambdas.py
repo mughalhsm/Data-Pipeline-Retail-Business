@@ -49,7 +49,8 @@ class Deploy_lambdas():
         except Exception as e:
             print(f"Error creating lambda {lambda_name} using {code_bucket} {zip_file} and role arn {role_arn}")
             print(e.response)
-        print("Created")
+            response = e.response
+        print(f"Created with response {response}")
         return response
     
     def create_lambda_layer(self,layer_name:str,zipfile:str,description:str):
