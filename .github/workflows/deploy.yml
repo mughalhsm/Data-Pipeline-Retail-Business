@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - fix-role-naming-convention
+      - bucket-policies-and-notifications
 
 jobs:
   create-buckets-and-lambdas:
