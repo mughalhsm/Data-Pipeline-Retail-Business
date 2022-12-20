@@ -7,7 +7,7 @@ testing_prefix = "bosch-deploy-2-"
 
 ingest_handler_name = f"my_handler"
 process_payments_handler_name = ""
-process_purchases_handler_name = ""
+process_purchases_handler_name = "lambda_handler"
 process_sales_handler_name = ""
 upload_handler_name = ""
 

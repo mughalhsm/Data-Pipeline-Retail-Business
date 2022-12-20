@@ -27,7 +27,6 @@ class Deploy_lambdas():
     
     def create_lambda(self,lambda_name:str,code_bucket:str,zip_file:str,role_arn:str,handler_name:str):
         print(f"Creating lambda {lambda_name} using {code_bucket} {zip_file} and role arn {role_arn}")
-        time.sleep(1)
         try:
             response = self.lambda_client.create_function(
                     FunctionName=lambda_name,
@@ -52,7 +51,6 @@ class Deploy_lambdas():
             print(f"Error creating lambda {lambda_name} using {code_bucket} {zip_file} and role arn {role_arn}")
             print(e.response)
             response = e.response
-        time.sleep(1)
         print(f"Created with response {response}")
         return response
     
