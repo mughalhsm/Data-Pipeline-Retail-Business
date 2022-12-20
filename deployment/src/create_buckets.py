@@ -92,6 +92,7 @@ class Create_resources():
                     }
                 ]
             }
+        print(f"Assigning bucket policy to {bucket_name} and policy {policy_document}")
         try:
             self.s3.put_bucket_policy(Bucket=bucket_name, Policy=policy_document)
         except ClientError as ce:
