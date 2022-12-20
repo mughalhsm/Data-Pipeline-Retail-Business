@@ -1,4 +1,5 @@
 import os
+import shutil
 import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
@@ -78,12 +79,12 @@ class Create_resources():
             self.errors.append(error)
             raise ce
 
-    def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str):
+    def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str='lambda', prerequisite_zip:str=None):
         """Using a folder path, lambda name, and destination code bucket, zip the lambda into an archive and upload it to aws s3 bucket"""
         try:
-            zip_directory(folder_path)
-            with open("lambda.zip", "rb") as file:
-                self.s3.upload_fileobj(file, code_bucket, lambda_name+".zip")
+            zip_directory(folder_path,zip_name=f'{lambda_name}.zip',base_zip=prerequisite_zip)
+            with open(f'{lambda_name}.zip', "rb") as file:
+                self.s3.upload_fileobj(file, code_bucket, f'{lambda_name}.zip')
         except ClientError as nb:
             print(
                 f"Bucket does not exist. Upload of {lambda_name} to {code_bucket} failed")
@@ -91,9 +92,13 @@ class Create_resources():
             raise e
 
 
-def zip_directory(folder_path: str,zip_name:str="lambda.zip"):
+def zip_directory(folder_path: str,zip_name:str="lambda.zip",write_type:str="w",base_zip:str=None):
     """Create a zip file, where the contents are at the top level where they would be with respect for their folder's path"""
-    zip_file = zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED)
+    """If a zip file of prerequisites is used as a baseline, copy it to be of the appropriate name"""
+    if base_zip != None:
+        write_type='a'
+        shutil.copy(base_zip,zip_name)
+    zip_file = zipfile.ZipFile(zip_name, write_type, zipfile.ZIP_DEFLATED)
     zip_walk(folder_path, zip_file, "")
 
 
