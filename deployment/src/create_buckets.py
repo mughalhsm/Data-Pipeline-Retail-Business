@@ -77,7 +77,8 @@ class Create_resources():
             error = 'Client Error : ' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
-            raise ce
+            if ce.response['Error']['Code'] == "InvalidArgument":
+                print("Invalid argument error - likely permissions incompletely setup")
 
     def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str='lambda', prerequisite_zip:str=None):
         """Using a folder path, lambda name, and destination code bucket, zip the lambda into an archive and upload it to aws s3 bucket"""
