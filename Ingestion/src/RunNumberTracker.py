@@ -6,12 +6,13 @@ import datetime
 import time
 import logging
 s3 = boto3.resource('s3')
-bucket_name = 'cees-nc-test-bucket-2'
+bucket_name = 'bosch-test-run-2-ingest-bucket'
 prefix = 'Run-tracker'
 
 def check_input_details_correct():
     print('Checking correct input of bucket_name and prefix...')
-    if bucket_name != 'cees-nc-test-bucket-2' or prefix != 'Run-tracker':
+    if bucket_name != 'bosch-test-run-2-ingest-bucket' or prefix != 'Run-tracker':
+        logging.error('Wrong names given')
         quit()
     else:
         return bucket_name, prefix
@@ -29,11 +30,10 @@ def check_bucket(bucket):
         # If it was a 404 error, then the bucket does not exist. 
         error_code = int(e.response['Error']['Code'])
         if error_code == 403:
-            print("Private Bucket. Forbidden Access - Possible incorrect credentials")
-            print(e.response)
+            logging.error("Private Bucket. Forbidden Access - Possible incorrect credentials")
             return True
         elif error_code == 404:
-            print("Bucket Does Not Exist!")
+            logging.error("Bucket Does Not Exist!")
             return False, 'NEEDTOCREATE'
 
 
@@ -64,16 +64,16 @@ def push_updated_file_back_to_bucket(dataframe): ## this function should overwri
 
 def increment_run_number(key_to_download, file_name):
     s3client=boto3.client('s3')
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M') ## doesnt need seconds
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M') 
     print('Downloading file...')
     try:
-        s3client.download_file(Bucket=bucket_name,Key=key_to_download,Filename=f'/tmp/{file_name}.csv')
+        s3client.download_file(Bucket=bucket_name,Key=key_to_download,Filename=f'/tmp/{file_name}')
     except ClientError as e:
         print(e.response['Error'])
 
-    with open(f'/tmp/{file_name}.csv', 'r') as f:
+    with open(f'/tmp/{file_name}', 'r') as f:
         print('Updating file...')
-        df = pd.read_csv(f'{file_name}.csv') 
+        df = pd.read_csv(f'/tmp/{file_name}') 
     try:
         df.at[0, 'Run'] +=1                 ## incrementing the run amount
         df.at[0, 'Timestamp'] = timestamp
@@ -96,7 +96,8 @@ def getting_last_object(bucket_name, prefix):
             latest2 = max(page['Contents'], key=lambda x: x['LastModified'])
             if latest is None or latest2['LastModified'] > latest['LastModified']:
                 latest = latest2
-    print(latest['Key'], '<- file name that will be incremeneted')
+    print(latest['Key'], '<- file name that will be incremented')
+
     last_file_key = latest['Key']
     parts = last_file_key.split("/")
     last_file_name = parts[1]
@@ -104,6 +105,7 @@ def getting_last_object(bucket_name, prefix):
     return UpdatedVal
 
 def check_if_empty_bucket():
+    print('checking if empty bucket')
     s3 = boto3.client('s3')
     try:
         response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix) ## have to specify correctly, otherwise will be creating loads...
@@ -124,23 +126,12 @@ def num_track_run_func():
         print(increment)
         return increment
     if increment == None:
-        print('Something is very wrong, check prefix and bucket_name are correct')
+        logging.error('Something is very wrong, check prefix and bucket_name are correct')
         quit()
     logging.info('Run number updated successfully, can continue to ingestion')
     return increment
 
-# if check_if_empty_bucket() == 0:  
-#     print('Bucket is empty...')  
-#     create_initial_time_stamp_file()   
-# else:
-#     print('Bucket is not empty') 
 
-
-# if check_bucket(bucket)==True:
-#     increment = getting_last_object(bucket_name, prefix)
-#     if increment == None:
-#         print('Something is very wrong, check prefix and bucket_name are correct')
-#         quit()
 
 
 # elif check_bucket(bucket)[1]=='NEEDTOCREATE':
