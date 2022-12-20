@@ -81,7 +81,7 @@ class Create_resources():
 
     def apply_bucket_permissions(self, bucket_name: str):
         policy_document = {
-                "Version": "2012-10-2017",
+                "Version": "2012-10-17",
                 "Statement": [
                     {
                         "Sid": "AllowPutBucketNotification",
