@@ -85,6 +85,7 @@ def create_lambdas(permit: Assign_iam, deploy: Deploy_lambdas, lambda_name:str, 
     if handler_method == "": 
         print("No handler found")
         return
+    print("Create lambda using :",lambda_name,role_name,handler_method)
     deploy.create_lambda(lambda_name=lambda_name, code_bucket=code_bucket_name,
                          role_arn=permit.role_arns[role_name], zip_file=f'{lambda_name}.zip',handler_name=handler_method)
 
