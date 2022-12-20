@@ -1,6 +1,6 @@
 from deployment.src.create_buckets import Create_resources
 
-testing_prefix = "bosch-test-run-2-"
+testing_prefix = "bosch-deploy-2-"
 
 
 
