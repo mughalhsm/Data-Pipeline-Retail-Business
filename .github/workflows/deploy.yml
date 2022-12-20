@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - fix-role-naming-convention
+      - lambda-layers
 
 jobs:
   create-buckets-and-lambdas:
