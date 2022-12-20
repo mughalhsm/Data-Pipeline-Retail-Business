@@ -44,6 +44,7 @@ class Create_resources():
         if lambda_arn==None or bucket_name==None:
             print(f'Incomplete parameters for creating trigger')
             return
+        self.apply_bucket_permissions(bucket_name)
         notification_config = {
             'LambdaFunctionConfigurations': [
                 {
@@ -76,6 +77,25 @@ class Create_resources():
             error = 'Client Error : ' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
+            raise ce
+
+    def apply_bucket_permissions(self, bucket_name: str):
+        policy_document = {
+                "Version": "2012-10-2017",
+                "Statement": [
+                    {
+                        "Sid": "AllowPutBucketNotification",
+                        "Effect": "Allow",
+                        "Principal": "*",
+                        "Action": "s3:PutBucketNotification",
+                        "Resource": f'arn:aws:s3:::{bucket_name}'
+                    }
+                ]
+            }
+        try:
+            self.s3.put_bucket_policy(Bucket=bucket_name, Policy=policy_document)
+        except ClientError as ce:
+            print(f'Failed for {bucket_name} applying {policy_document}')
             raise ce
 
     def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str):
