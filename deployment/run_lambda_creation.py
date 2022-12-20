@@ -3,7 +3,7 @@ from deployment.src.assign_iam import Assign_iam
 from deployment.src.create_buckets import Create_resources
 from deployment.src.event_handler import Create_events
 
-testing_prefix = "bosch-deploy-1-"
+testing_prefix = "bosch-test-run-3-"
 
 ingest_handler_name = f"my_handler"
 process_payments_handler_name = ""
