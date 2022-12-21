@@ -7,7 +7,9 @@ deployment_playground.py
 purchase_data_processing/src/table_files
 purchase_data_processing/src/__pycache__
 purchase_data_processing/test/__pycache__
-purchase_data_processing/test/table_files
+purchase_data_processing/test/test_table_files
+purchase_data_processing/test/test_example_files
+purchase_data_processing/test/test_downloaded_parquet_file.parquet
 purchase_data_processing/test/.pytest_cache
 
 
