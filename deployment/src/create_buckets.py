@@ -1,10 +1,9 @@
 import os
+import shutil
 import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config
 import zipfile
-# Pandas import only for obtaining pandas install location
-import pandas
 
 
 class Create_resources():
@@ -17,23 +16,15 @@ class Create_resources():
     def create_aws_connection(self):
         """Create the s3 client, using secrets obtained from github secrets"""
         try:
-            if 'GITHUB_TOKEN' in os.environ:
-                github_secrets: dict = os.environ['GITHUB_TOKEN']
-                os.environ['AWS_ACCESS_KEY_ID'] = github_secrets['AWS_ACCESS_KEY']
-                os.environ['AWS_SECRET_ACCESS_KEY'] = github_secrets['AWS_SECRET_KEY']
-
             self.s3 = boto3.client('s3',
                                    region_name='us-east-1')
         except ClientError as ce:
             error = 'Client Error :' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
+            raise ce
         except AttributeError as ae:
-            error = "Failed to find attributes 'AWS_ACCESS_KEY' and 'AWS_SECRET_KEY' on key 'GITHUB_TOKEN'"
-            print(error)
-            self.errors.append(error)
-        except KeyError as ke:
-            error = "Failed to find keys 'AWS_ACCESS_KEY' and 'AWS_SECRET_KEY' on key 'GITHUB_TOKEN'"
+            error = "Failed to find attributes 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'"
             print(error)
             self.errors.append(error)
         except Exception as e:
@@ -51,6 +42,9 @@ class Create_resources():
 
     def assign_bucket_update_event_triggers(self, bucket_name: str, lambda_arn: str, bucket_folders: list):
         """Trigger the appropriate lambda function when a bucket folder has new files added"""
+        if lambda_arn==None or bucket_name==None:
+            print(f'Incomplete parameters for creating trigger')
+            return
         notification_config = {
             'LambdaFunctionConfigurations': [
                 {
@@ -71,6 +65,8 @@ class Create_resources():
                         'Value': folder
                     }
                 )
+        print(f"Applying configurations : {notification_config}")
+        print(f"For {bucket_name}")
         try:
             response = self.s3.put_bucket_notification_configuration(
                 Bucket=bucket_name,
@@ -81,13 +77,15 @@ class Create_resources():
             error = 'Client Error : ' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
+            if ce.response['Error']['Code'] == "InvalidArgument":
+                print("Invalid argument error - likely permissions incompletely setup")
 
-    def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str, pandas_dependency: bool = False):
+    def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str='lambda', prerequisite_zip:str=None):
         """Using a folder path, lambda name, and destination code bucket, zip the lambda into an archive and upload it to aws s3 bucket"""
         try:
-            zip_directory(folder_path, pandas_dependency)
-            with open("lambda.zip", "rb") as file:
-                self.s3.upload_fileobj(file, code_bucket, lambda_name+".zip")
+            zip_directory(folder_path,zip_name=f'{lambda_name}.zip',base_zip=prerequisite_zip)
+            with open(f'{lambda_name}.zip', "rb") as file:
+                self.s3.upload_fileobj(file, code_bucket, f'{lambda_name}.zip')
         except ClientError as nb:
             print(
                 f"Bucket does not exist. Upload of {lambda_name} to {code_bucket} failed")
@@ -95,16 +93,14 @@ class Create_resources():
             raise e
 
 
-def zip_directory(folder_path: str, pandas_dependency: bool = False):
+def zip_directory(folder_path: str,zip_name:str="lambda.zip",write_type:str="w",base_zip:str=None):
     """Create a zip file, where the contents are at the top level where they would be with respect for their folder's path"""
-    zip_file = zipfile.ZipFile("lambda.zip", 'w', zipfile.ZIP_DEFLATED)
+    """If a zip file of prerequisites is used as a baseline, copy it to be of the appropriate name"""
+    if base_zip != None:
+        write_type='a'
+        shutil.copy(base_zip,zip_name)
+    zip_file = zipfile.ZipFile(zip_name, write_type, zipfile.ZIP_DEFLATED)
     zip_walk(folder_path, zip_file, "")
-
-    if pandas_dependency:
-        # -12 as this will always show path to pandas/__init__.py
-        location = pandas.__file__[:-12]
-        zip_walk(location, zip_file, "pandas/")
-        print(f"Zipped pandas from {location}")
 
 
 def zip_walk(folder_path: str, zip_file: zipfile.ZipFile, target_subfolder: str = ""):

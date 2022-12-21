@@ -14,8 +14,10 @@ def get_credentials(Secret_name):
                 SecretId=Secret_name
     )
     except ClientError as ce:
+
         print('ERROR, check if correct secret name.' , ce.response['Error']['Code'])
         raise ClientError
+
 
     secret_dict = json.loads(secret['SecretString'])
 
