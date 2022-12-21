@@ -1,7 +1,23 @@
 import boto3
+from botocore.exceptions import ClientError
 # Script that provides event bridge scheduler for specific lambda function
 # Set up the client for the AWS Events service
+
+def getting_caller_id():
+    # Getting account ID
+    try:
+        sts_client = boto3.client('sts')
+        caller_identity = sts_client.get_caller_identity()
+        AWS_ACCOUNT_ID = caller_identity['Account']
+        return AWS_ACCOUNT_ID
+    except ClientError as ce:
+        quit(ce)
+
+
+
 def main():
+    AWS_ACCOUNT_ID=getting_caller_id()
+    
     events_client = boto3.client('events')
     lambda_client = boto3.client('lambda')
 
@@ -9,10 +25,6 @@ def main():
     FUNCTION_NAME = 'Ingestion_Function5'
     AWS_REGION = 'us-east-1'
 
-    # Get the AWS account ID
-    sts_client = boto3.client('sts')
-    caller_identity = sts_client.get_caller_identity()
-    AWS_ACCOUNT_ID = caller_identity['Account']
 
     # Create the ARN for the Lambda function, e.g - arn:aws:lambda:us-east-1:448064563446:function:Ingestion_Function5
     LAMBDA_ARN = f"arn:aws:lambda:{AWS_REGION}:{AWS_ACCOUNT_ID}:function:{FUNCTION_NAME}"
