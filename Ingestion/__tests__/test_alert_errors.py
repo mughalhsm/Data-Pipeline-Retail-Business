@@ -2,7 +2,7 @@ import boto3
 from botocore.exceptions import ClientError, ParamValidationError
 from moto import mock_logs
 import pytest
-from src.alter_errors import put_metric_filter_func
+from src.Alert_errors_email import put_metric_filter_func
 from unittest.mock import patch
 import os
 

@@ -9,7 +9,7 @@ from DeleteLastRunNum import delete_last_run_num_object
 from Credentials import get_credentials
 from RunNumberTracker import num_track_run_func, check_input_details_correct, check_bucket, create_initial_time_stamp_file, getting_last_object, check_if_empty_bucket, push_updated_file_back_to_bucket, increment_run_number
 import time
-#wrap function and invoke at bottom if not using lambda handler
+
 def my_handler(event, context):
 
     bucket_name = 'bosch-test-run-2-ingest-bucket'
@@ -17,11 +17,8 @@ def my_handler(event, context):
     check_input_details_correct()
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-
     s3=boto3.client("s3")
                         
-    # Getting the current date and time for use as timestamp
-    dt = datetime.datetime.now()
     try:
         credentials = get_credentials('totesys_credentials')
     except TypeError as te:
@@ -54,7 +51,7 @@ def my_handler(event, context):
     logging.info(f"All table names within the database: {tables}")
 
 
-    logging.error("Error logging is enabled")
+    logging.error("Error logging is enabled") #purpose is to show errors work
     #iterative processs begins, formats data, then ingests into specific parts
     try:
         for table in tables:     ## Goes over each table, then selects all from the table
@@ -71,7 +68,7 @@ def my_handler(event, context):
 
             ## Now you have the columns and rows as lists inside of tuples
             table_row_data = list(rows)
-            list_of_column_names=[]
+            list_of_column_names = []
             for name in column_names:
                 list_of_column_names.append(name[0])
             ##formatted above for pandas, have colums as a list and data as nested list containing rows
@@ -80,13 +77,12 @@ def my_handler(event, context):
             Database_df = pd.DataFrame(table_row_data, columns=list_of_column_names)        
             dataframe_as_csv = Database_df.to_csv(index=False)
 
-
             logging.info(f'Ingestion succesful for: {table_name}, run count: {increment}')
             try:
                 s3.put_object(Bucket=bucket_name, Key=f"TableName/{table_name}/RunNum:{increment}.csv", Body=dataframe_as_csv),
             except Exception as ce:
                 logging.error(ce)
-                delete_last_run_num_object(bucket_name, prefix)
+                delete_last_run_num_object(bucket_name, prefix) ##if increment fails somehow then cleans up files back to original state
 
     except Exception as e:
         logging.error('Check that file name and run num still aligns', e)
