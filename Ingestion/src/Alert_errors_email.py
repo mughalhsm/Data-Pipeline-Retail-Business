@@ -1,7 +1,6 @@
 import boto3
 from botocore.exceptions import ClientError
-
-
+import os
 
 cloudwatch_logs = boto3.client("logs")
 sns = boto3.client("sns")
@@ -71,7 +70,6 @@ def subscribe_by_email(createdErr_topic_arn):
 ##Adds metric alarm, testing against the 1 given by the filter, if >= then 
 ##alarmactions = topic_arn which sends me an email
 def put_metric_alarm(createdErr_topic_arn):
-
     try:
         print('trying to put metric alarm')
         metric_alarm_response = cloudwatch.put_metric_alarm(
@@ -102,10 +100,8 @@ def sub_list():
         quit()
 
 
-
 ## thoughts on how i could make this better, make it user input based and f strings
 ## then easier to add people to a certain topic or something like that
-
 
 def main():
     put_metric_filter_func(logGroupName="/aws/lambda/Ingestion_Function5", filterName="errors-filter", filterPattern="ERROR", metricTransformations=[
@@ -123,4 +119,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
