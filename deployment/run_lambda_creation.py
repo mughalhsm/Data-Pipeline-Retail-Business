@@ -3,11 +3,11 @@ from deployment.src.assign_iam import Assign_iam
 from deployment.src.create_buckets import Create_resources
 from deployment.src.event_handler import Create_events
 
-testing_prefix = "bosch-deploy-1-"
+testing_prefix = "bosch-deploy-2-"
 
 ingest_handler_name = f"my_handler"
 process_payments_handler_name = ""
-process_purchases_handler_name = ""
+process_purchases_handler_name = "lambda_handler"
 process_sales_handler_name = ""
 upload_handler_name = ""
 
@@ -85,6 +85,7 @@ def create_lambdas(permit: Assign_iam, deploy: Deploy_lambdas, lambda_name:str, 
     if handler_method == "": 
         print("No handler found")
         return
+    print("Create lambda using :",lambda_name,role_name,handler_method)
     deploy.create_lambda(lambda_name=lambda_name, code_bucket=code_bucket_name,
                          role_arn=permit.role_arns[role_name], zip_file=f'{lambda_name}.zip',handler_name=handler_method)
 

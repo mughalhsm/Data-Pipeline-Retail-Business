@@ -1,6 +1,6 @@
 from deployment.src.create_buckets import Create_resources
 
-testing_prefix = "bosch-test-run-2-"
+testing_prefix = "bosch-deploy-2-"
 
 
 
@@ -22,21 +22,26 @@ def create_buckets():
     process_purchases_lambda_name = f"{testing_prefix}process_purchases"
     process_sales_lambda_name = f"{testing_prefix}process_sales"
     upload_lambda_name = f"{testing_prefix}upload"
+    
+    ingest_prerequisite = "pg8000.zip"
+    process_prerequisite = "fastpandas.zip"
+    output_prerequisite = "pg8000.zip"
+    
     if ingest_lambda_path != "":
         create.upload_lambda_function_code(
-            code_bucket=code_bucket_name, folder_path=ingest_lambda_path, lambda_name=ingest_lambda_name)
+            code_bucket=code_bucket_name, folder_path=ingest_lambda_path, lambda_name=ingest_lambda_name,prerequisite_zip=ingest_prerequisite)
     if process_payments_lambda_path != "":
         create.upload_lambda_function_code(code_bucket=code_bucket_name, folder_path=process_payments_lambda_path,
-                                           lambda_name=process_payments_lambda_name)
+                                           lambda_name=process_payments_lambda_name,prerequisite_zip=process_prerequisite)
     if process_purchases_lambda_path != "":
         create.upload_lambda_function_code(code_bucket=code_bucket_name, folder_path=process_purchases_lambda_path,
-                                           lambda_name=process_purchases_lambda_name)
+                                           lambda_name=process_purchases_lambda_name,prerequisite_zip=process_prerequisite)
     if process_sales_lambda_path != "":
         create.upload_lambda_function_code(code_bucket=code_bucket_name, folder_path=process_sales_lambda_path,
-                                           lambda_name=process_sales_lambda_name)
+                                           lambda_name=process_sales_lambda_name,prerequisite_zip=process_prerequisite)
     if warehouse_uploader_lambda_path != "":
         create.upload_lambda_function_code(
-            code_bucket=code_bucket_name, folder_path=warehouse_uploader_lambda_path, lambda_name=upload_lambda_name)
+            code_bucket=code_bucket_name, folder_path=warehouse_uploader_lambda_path, lambda_name=upload_lambda_name,prerequisite_zip=output_prerequisite)
 
 
 if __name__ == '__main__':

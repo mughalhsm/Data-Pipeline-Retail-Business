@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - fix-role-naming-convention
+      - lambda-layers
 
 jobs:
   create-buckets-and-lambdas:
@@ -18,15 +18,18 @@ jobs:
           pip install boto3
           pip install pandas -t .
           pip install pg8000 -t .
+          pip install fastparquet -t .
           CURRENTLOC=$(pwd)
           ls -la
           echo Zipping dependencies
-          cd pandas
           echo Zipping from $(pwd) to $(${CURRENTLOC}/pandas.zip)
-          zip -r9 ${CURRENTLOC}/pandas.zip .
-          cd ../pg8000
+          zip -r9 ${CURRENTLOC}/pandas.zip pandas
           echo Zipping from $(pwd) to $(${CURRENTLOC}/pg8000.zip)
-          zip -r9 ${CURRENTLOC}/pg8000.zip .
+          zip -r9 ${CURRENTLOC}/pg8000.zip pg8000
+          echo Zipping from $(pwd) to $(${CURRENTLOC}/fastparquet.zip)
+          zip -r9 ${CURRENTLOC}/fastparquet.zip fastparquet
+          echo Zipping pandas and fastparquet together
+          zip -j fastpandas.zip pandas.zip fastparquet.zip
           # -r deployment/requirements.txt
           # pip install -e .
       - name: Execute python script to create buckets on the s3 aws server
