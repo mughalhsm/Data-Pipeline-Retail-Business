@@ -275,7 +275,7 @@ def save_to_processed_sales_bucket_as_csv(table_name, run_num, dataframe):
 
 def save_to_processed_sales_bucket(table_name, run_num, dataframe):
     try:
-        table_names = ['address','counterparty','currency','department','design','sales_order','staff', 'date']
+        table_names = ['location','counterparty','currency','department','design','sales_order','staff', 'date']
 
         if table_name not in table_names:
             raise LookupError()

@@ -1,5 +1,5 @@
 
-from process_sales_order_utils import retrieve_ingested_csv, create_fact_sales_order_dataframe, create_staff_dim_table, create_currency_dim_table, create_design_dim_table, create_counterparty_dim_table, create_date_dim_table, get_run_number, save_to_processed_sales_bucket, save_to_processed_sales_bucket_as_csv, csvString_to_dict
+from process_sales_order_utils import retrieve_ingested_csv, create_fact_sales_order_dataframe, create_staff_dim_table, create_currency_dim_table, create_design_dim_table, create_counterparty_dim_table, create_date_dim_table, get_run_number, save_to_processed_sales_bucket, csvString_to_dict, create_location_dim_table
 import pandas as pd
 from datetime import datetime as dt
 
@@ -49,9 +49,10 @@ currency_dim = create_currency_dim_table(currency_df)
 design_dim = create_design_dim_table(design_df)
 counterparty_dim = create_counterparty_dim_table(counterparty_df,address_df)
 date_dim = create_date_dim_table(sales_order_df)
+location_dim = create_location_dim_table(address_df)
 
-df_list = [fact_sales_order,staff_dim,currency_dim,design_dim,counterparty_dim,date_dim]
-table_names = ['sales_order','staff','currency','design','counterparty','date']
+df_list = [fact_sales_order,staff_dim,currency_dim,design_dim,counterparty_dim,date_dim, location_dim]
+table_names = ['sales_order','staff','currency','design','counterparty','date', 'location']
 
 for i in range(len(df_list)):
     save_to_processed_sales_bucket(table_names[i],run_num,df_list[i])
