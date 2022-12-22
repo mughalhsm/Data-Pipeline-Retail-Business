@@ -18,7 +18,7 @@ def get_credentials(Secret_name):
         raise ClientError(operation_name='ResourceNotFound', error_response={
             'Error': {
                 'Code': 'ResourceNotFound',
-                'Message': 'Check if correct secret name'
+                'Message': 'CHECK IF CREDENTIALS ARE CORRECT'
             }
         }) ## Having to force it to raise a ClientError??
    
@@ -56,6 +56,25 @@ def delete_last_run_num_object(bucket_name, prefix):
                 latest = latest2
     print(latest['Key'], '<- Removing...')
     s3.delete_object(Bucket=bucket_name, Key=latest['Key'])
+
+##Validates that what is being passed into sql query is correct
+def table_name_checker(table_name):
+    table_names=['counterparty',
+                'currency',
+                'department',
+                'design',
+                'staff',
+                'sales_order',
+                'address',
+                'payment',
+                'purchase_order',
+                'payment_type',
+                'transaction']
+    if table_name in table_names:
+        return True
+    return False
+
+
    
    ## ## ##
 def delete_TESTFUNC_last_run_num_object(bucket_name):
@@ -73,3 +92,4 @@ def delete_TESTFUNC_last_run_num_object(bucket_name):
     print(latest['Key'], '<- Removing...')
     s3.delete_object(Bucket=bucket_name, Key=latest['Key'])
    ## ## ##
+

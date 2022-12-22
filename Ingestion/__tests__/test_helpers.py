@@ -2,7 +2,7 @@ import boto3
 import json
 import pytest
 from moto import mock_secretsmanager, mock_s3
-from src.Helpers import get_credentials, put_into_bucket, delete_TESTFUNC_last_run_num_object
+from src.Helpers import get_credentials, put_into_bucket, delete_TESTFUNC_last_run_num_object, table_name_checker
 from botocore.exceptions import ClientError
 import unittest
 import time
@@ -68,7 +68,6 @@ def test_put_into_buckets():
 
     assert f"TableName/{test_table_name}/RunNum:{test_increment}.csv" in response_list['Contents'][0]['Key']
 
-@pytest.mark.skip
 @mock_s3
 def test_can_be_called_multiple_times_and_store_multiple_objects():
     '''Tests 2 things, 1: can store multiple things in a bucket
@@ -99,3 +98,14 @@ def test_can_be_called_multiple_times_and_store_multiple_objects():
     response_list2 = s3conn.list_objects_v2(Bucket=test_bucket_name)
     assert len(response_list2['Contents']) == 3
     assert 'TableName/TESTtable_name4/RunNum:TESTincrement4.csv' not in response_list2['Contents']
+
+
+
+def test_table_name_checker_can_return_false():
+    invokeFalse = table_name_checker('ShouldError')
+
+    assert invokeFalse == False
+
+    invokeTrue = table_name_checker('counterparty')
+
+    assert invokeTrue == True
