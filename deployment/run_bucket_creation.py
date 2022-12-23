@@ -1,6 +1,6 @@
 from deployment.src.create_buckets import Create_resources
 
-testing_prefix = "bosch-deploy-2-"
+deploy_prefix = "bosch-deploy-23-12-22-"
 
 
 
@@ -8,24 +8,30 @@ def create_buckets():
     ingest_lambda_path = "Ingestion/src"
     process_payments_lambda_path = ""
     process_purchases_lambda_path = "purchase_data_processing/src"
-    process_sales_lambda_path = ""
-    warehouse_uploader_lambda_path = ""
-    code_bucket_name = f'{testing_prefix}code-bucket'
-    processed_bucket_name = f'{testing_prefix}processed-bucket'
-    ingest_bucket_name = f'{testing_prefix}ingest-bucket'
+    process_sales_lambda_path = "process_sales_src"
+    warehouse_uploader_lambda_path = "Uploading/"
+    code_bucket_name = f'{deploy_prefix}code-bucket'
+    processed_bucket_name = f'{deploy_prefix}processed-bucket'
+    ingest_bucket_name = f'{deploy_prefix}ingest-bucket'
+    
+    print("Creating buckets")
     create = Create_resources()
-    create.create_s3_bucket(code_bucket_name)
-    create.create_s3_bucket(processed_bucket_name)
-    create.create_s3_bucket(ingest_bucket_name)
-    ingest_lambda_name = f"{testing_prefix}ingest"
-    process_payments_lambda_name = f"{testing_prefix}process_payments"
-    process_purchases_lambda_name = f"{testing_prefix}process_purchases"
-    process_sales_lambda_name = f"{testing_prefix}process_sales"
-    upload_lambda_name = f"{testing_prefix}upload"
+    response = create.create_s3_bucket(code_bucket_name)
+    print(f'Created code bucket with response {response}')
+    response = create.create_s3_bucket(processed_bucket_name)
+    print(f'Created processed bucket with response {response}')
+    response = create.create_s3_bucket(ingest_bucket_name)
+    print(f'Created ingest bucket with response {response}')
+    
+    ingest_lambda_name = f"{deploy_prefix}ingest"
+    process_payments_lambda_name = f"{deploy_prefix}process_payments"
+    process_purchases_lambda_name = f"{deploy_prefix}process_purchases"
+    process_sales_lambda_name = f"{deploy_prefix}process_sales"
+    upload_lambda_name = f"{deploy_prefix}upload"
     
     ingest_prerequisite = "pg8000.zip"
     process_prerequisite = "fastpandas.zip"
-    output_prerequisite = "pg8000.zip"
+    output_prerequisite = "pg8000.zip" #"psychopg2.zip"
     
     if ingest_lambda_path != "":
         create.upload_lambda_function_code(
