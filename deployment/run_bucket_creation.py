@@ -1,6 +1,6 @@
 from deployment.src.create_buckets import Create_resources
 
-deploy_prefix = "bosch-deploy-23-12-22-"
+deploy_prefix = "bosch-deploy-23-12-22-v2-"
 
 
 
@@ -33,6 +33,7 @@ def create_buckets():
     process_prerequisite = "fastpandas.zip"
     output_prerequisite = "pg8000.zip" #"psychopg2.zip"
     
+    print('uploading lambdas where valid')
     if ingest_lambda_path != "":
         create.upload_lambda_function_code(
             code_bucket=code_bucket_name, folder_path=ingest_lambda_path, lambda_name=ingest_lambda_name,prerequisite_zip=ingest_prerequisite)
