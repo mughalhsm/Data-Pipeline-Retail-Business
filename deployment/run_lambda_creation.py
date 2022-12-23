@@ -3,7 +3,7 @@ from deployment.src.assign_iam import Assign_iam
 from deployment.src.create_buckets import Create_resources
 from deployment.src.event_handler import Create_events
 
-testing_prefix = "bosch-deploy-2-"
+deploy_prefix = "bosch-deploy-23-12-22"
 
 ingest_handler_name = f"my_handler"
 process_payments_handler_name = ""
@@ -11,21 +11,21 @@ process_purchases_handler_name = "lambda_handler"
 process_sales_handler_name = ""
 upload_handler_name = ""
 
-ingest_lambda_name = f"{testing_prefix}ingest"
-process_payments_lambda_name = f"{testing_prefix}process_payments"
-process_purchases_lambda_name = f"{testing_prefix}process_purchases"
-process_sales_lambda_name = f"{testing_prefix}process_sales"
-upload_lambda_name = f"{testing_prefix}upload"
+ingest_lambda_name = f"{deploy_prefix}ingest"
+process_payments_lambda_name = f"{deploy_prefix}process_payments"
+process_purchases_lambda_name = f"{deploy_prefix}process_purchases"
+process_sales_lambda_name = f"{deploy_prefix}process_sales"
+upload_lambda_name = f"{deploy_prefix}upload"
 
-ingest_role = f"{testing_prefix}ingest-role"
-process_payments_role = f"{testing_prefix}process-payments-role"
-process_purchases_role = f"{testing_prefix}process-purchases-role"
-process_sales_role = f"{testing_prefix}process-sales-role"
-warehouse_uploader_role = f"{testing_prefix}warehouse-uploader-role"
+ingest_role = f"{deploy_prefix}ingest-role"
+process_payments_role = f"{deploy_prefix}process-payments-role"
+process_purchases_role = f"{deploy_prefix}process-purchases-role"
+process_sales_role = f"{deploy_prefix}process-sales-role"
+warehouse_uploader_role = f"{deploy_prefix}warehouse-uploader-role"
 
-processed_bucket_name = f'{testing_prefix}processed-bucket'
-ingest_bucket_name = f'{testing_prefix}ingest-bucket'
-code_bucket_name = f'{testing_prefix}code-bucket'
+processed_bucket_name = f'{deploy_prefix}processed-bucket'
+ingest_bucket_name = f'{deploy_prefix}ingest-bucket'
+code_bucket_name = f'{deploy_prefix}code-bucket'
 
 def deploy_lambdas():
     permit = Assign_iam()
