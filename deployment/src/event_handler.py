@@ -15,11 +15,6 @@ class Create_events():
     def create_aws_connection(self):
         """Create the events client, using secrets obtained from github secrets"""
         try:
-            if 'GITHUB_TOKEN' in os.environ:
-                github_secrets: dict = os.environ['GITHUB_TOKEN']
-                os.environ['AWS_ACCESS_KEY_ID'] = github_secrets['AWS_ACCESS_KEY']
-                os.environ['AWS_SECRET_ACCESS_KEY'] = github_secrets['AWS_SECRET_KEY']
-
             self.events = boto3.client('events',
                                        region_name='us-east-1')
         except ClientError as ce:
@@ -27,11 +22,7 @@ class Create_events():
             print(error)
             self.errors.append(error)
         except AttributeError as ae:
-            error = "Failed to find attributes 'AWS_ACCESS_KEY' and 'AWS_SECRET_KEY' on key 'GITHUB_TOKEN'"
-            print(error)
-            self.errors.append(error)
-        except KeyError as ke:
-            error = "Failed to find keys 'AWS_ACCESS_KEY' and 'AWS_SECRET_KEY' on key 'GITHUB_TOKEN'"
+            error = "Failed to find attributes 'AWS_ACCESS_KEY_ID' and 'AWS_SECRET_ACCESS_KEY'"
             print(error)
             self.errors.append(error)
         except Exception as e:
@@ -55,6 +46,7 @@ class Create_events():
 
     def assign_event_target(self, schedule_name: str, target_arn: str):
         """For the passed in lambda arn, assign a rule to the lambda"""
+        print(f"Assigning for {schedule_name} and target {target_arn}")
         try:
             response = self.events.put_targets(
                 Rule=schedule_name,
@@ -70,3 +62,11 @@ class Create_events():
             error = 'Client Error : ' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
+            
+    def attach_event_to_lambda(self, event_arn:str, function_name:str):
+        response = self.events.create_event_source_mapping(
+            EventSourceArn=event_arn,
+            FunctionName=function_name
+        )
+        print(response)
+        return response

@@ -67,11 +67,13 @@ def increment_run_number(key_to_download, file_name):
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M') 
     print('Downloading file...')
     try:
+
         s3client.download_file(Bucket=bucket_name,Key=key_to_download,Filename=f'/tmp/{file_name}')
     except ClientError as e:
         print(e.response['Error'])
 
     with open(f'/tmp/{file_name}', 'r') as f:
+
         print('Updating file...')
         df = pd.read_csv(f'/tmp/{file_name}') 
     try:
@@ -126,10 +128,12 @@ def num_track_run_func():
         print(increment)
         return increment
     if increment == None:
+
         logging.error('Something is very wrong, check prefix and bucket_name are correct')
         quit()
     logging.info('Run number updated successfully, can continue to ingestion')
     return increment
+
 
 
 
