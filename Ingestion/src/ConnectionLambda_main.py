@@ -1,11 +1,10 @@
-#RUN 2ND after RunNumber has been incremented
 import pg8000
 import pandas as pd
 import datetime
 import boto3
 import logging
 from botocore.exceptions import ClientError
-from Helpers import get_credentials, put_into_bucket, delete_last_run_num_object
+from Helpers import get_credentials, put_into_bucket, delete_last_run_num_object, table_name_checker
 from RunNumberTracker import num_track_run_func, check_input_details_correct, check_bucket, create_initial_time_stamp_file, getting_last_object, check_if_empty_bucket, push_updated_file_back_to_bucket, increment_run_number
 import time
 
@@ -14,8 +13,6 @@ def my_handler(event, context):
     bucket_name = 'bosch-test-run-2-ingest-bucket'
     prefix = 'Run-tracker'
     check_input_details_correct()
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
     s3=boto3.client("s3")
                         
     try:
@@ -31,7 +28,7 @@ def my_handler(event, context):
             password=credentials[1],
             database="totesys"
         )
-        logger.info('DB Connection successful')
+        logging.info('DB Connection successful')
 
     except pg8000.InterfaceError as DBConnectionError:
         logging.error("An interface error occurred:", DBConnectionError, 'Your credentials may be incorrect')
@@ -55,10 +52,13 @@ def my_handler(event, context):
     try:
         for table in tables:     ## Goes over each table, then selects all from the table
             table_name = table[0] 
+            if table_name_checker(table_name) == False:
+                quit()
+            
 
             cursor.execute(f"SELECT * FROM {table_name}")
             rows = cursor.fetchall() ## This is all the data, excluding columns
-            logger.info(f"Queried table '{table_name}' with {len(rows)} rows")
+            logging.info(f"Queried table '{table_name}' with {len(rows)} rows")
 
             cursor.execute(
             f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{table_name}'")
@@ -76,9 +76,11 @@ def my_handler(event, context):
             Database_df = pd.DataFrame(table_row_data, columns=list_of_column_names)        
             dataframe_as_csv = Database_df.to_csv(index=False)
 
-            logging.info(f'Ingestion succesful for: {table_name}, run count: {increment}')
+           
             try:
                 put_into_bucket(bucket_name, table_name, increment, dataframe_as_csv)
+                print('put success')
+                logging.info(f'Ingestion succesful for: {table_name}, run count: {increment}')
             except Exception as ce:
                 logging.error(ce)
                 delete_last_run_num_object(bucket_name, prefix) ##if increment fails somehow then cleans up files back to original state
@@ -88,10 +90,8 @@ def my_handler(event, context):
         delete_last_run_num_object(bucket_name, prefix)
 
 
-
     cursor.close()  
     conn.close()
 
 
-
-
+# my_handler()
