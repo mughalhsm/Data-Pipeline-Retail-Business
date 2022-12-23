@@ -57,3 +57,8 @@ jobs:
           #   echo "Lambdas not assigned due to errors";
           #   PYTHONPATH=$(pwd) pytest -v | grep FAILED
           # fi
+      - name: Apply alarms
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        run: PYTHONPATH=$(pwd) python Ingestion/src/Alert_errors_email.py
