@@ -1,6 +1,6 @@
 from deployment.src.create_buckets import Create_resources
 
-deploy_prefix = "bosch-deploy-23-12-22"
+deploy_prefix = "bosch-deploy-23-12-22-"
 
 
 
