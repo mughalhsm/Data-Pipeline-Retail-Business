@@ -5,8 +5,7 @@ import datetime
 import boto3
 import logging
 from botocore.exceptions import ClientError
-from DeleteLastRunNum import delete_last_run_num_object
-from Credentials import get_credentials
+from Helpers import get_credentials, put_into_bucket, delete_last_run_num_object
 from RunNumberTracker import num_track_run_func, check_input_details_correct, check_bucket, create_initial_time_stamp_file, getting_last_object, check_if_empty_bucket, push_updated_file_back_to_bucket, increment_run_number
 import time
 
@@ -43,7 +42,7 @@ def my_handler(event, context):
             logging.error(ce.response, 'Possibly no credentials set')
     
 
-    increment = num_track_run_func()
+    increment = num_track_run_func() ## Begin run, start increment run time and timestamp
 
     cursor = conn.cursor()
     cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'") ## gets all table_names from the DB, assuming public
@@ -79,7 +78,7 @@ def my_handler(event, context):
 
             logging.info(f'Ingestion succesful for: {table_name}, run count: {increment}')
             try:
-                s3.put_object(Bucket=bucket_name, Key=f"TableName/{table_name}/RunNum:{increment}.csv", Body=dataframe_as_csv),
+                put_into_bucket(bucket_name, table_name, increment, dataframe_as_csv)
             except Exception as ce:
                 logging.error(ce)
                 delete_last_run_num_object(bucket_name, prefix) ##if increment fails somehow then cleans up files back to original state
