@@ -1,6 +1,7 @@
 import boto3
 import json
 from botocore.exceptions import ClientError
+import logging
 
 ##works on the basis that something has been uploaded into secrets manager under the name of 'totesys_credentials'
 
@@ -55,7 +56,16 @@ def delete_last_run_num_object(bucket_name, prefix):
             if latest is None or latest2['LastModified'] > latest['LastModified']:
                 latest = latest2
     print(latest['Key'], '<- Removing...')
-    s3.delete_object(Bucket=bucket_name, Key=latest['Key'])
+    try:
+        s3.delete_object(Bucket=bucket_name, Key=latest['Key'])
+    except ClientError as ce:
+        print(ce)
+        logging.error('Have to clean this up manually now')
+        if ce.response['Error']['Code']=='AccessDenied':
+            print('Someone probably forgot to give you access ')
+    
+        ## if you wanted to build on this youd remove the eventbridge
+        ##if you got access denied, or its possible its just overflows
 
 ##Validates that what is being passed into sql query is correct
 def table_name_checker(table_name):
@@ -72,7 +82,8 @@ def table_name_checker(table_name):
                 'transaction']
     if table_name in table_names:
         return True
-    return False
+    else:
+        return False
 
 
    

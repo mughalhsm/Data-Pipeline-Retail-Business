@@ -5,12 +5,19 @@ import time
 import psycopg2
 from psycopg2 import sql, extensions, Error, extras
 import re
+import logging
+from Upload_Helpers import get_credentials
+import pyarrow
 
+try:
+    credentials = get_credentials('postgres_credentials')
+except TypeError as te:
+    logging.error('Missing argument name')
 
-conn = psycopg2.connect(database="postgres", user="project_team_3", ## Need to hide these credentials
-password="e8yBk4a7EJGX2Nz", host="nc-data-eng-project-dw-prod.chpsczt8h1nu.eu-west-2.rds.amazonaws.com", port="5432")
+conn = psycopg2.connect(database="postgres", user=credentials[0], 
+password=credentials[1], host=credentials[2], port="5432")
 
-all_table_names = ['dim_counterparty', 'dim_currency', 'dim_date', 'dim_design', 'dim_location',
+all_table_names = ['dim_counterparty', 'dim_currency', 'dim_date', 'dim_design', 'dim_location', ## could hide these
 'dim_payment_type', 'dim_staff', 'dim_transaction', 'fact_payment', 'fact_purchase_order', 'fact_sales_order']
 
 cur = conn.cursor()
@@ -51,14 +58,14 @@ def get_parquet_data(bucket_name, key):
     global_df.to_csv('output.csv', index=False)
     print('finished reading')
 
+
 def creating_insert_string(string_count):
     '''Making a way to change the amount of values placeholder so that the insert
     works for any of the incoming tables''' 
     print('Creating insert query string with length:', string_count)
 
-    insert_string = 'INSERT INTO {} VALUES ( %s )'         #.format(specific_table)
+    insert_string = 'INSERT INTO {} VALUES ( %s )'         
     placeholderStr = insert_string.split("%s")
-
 
     changing_query_string = placeholderStr[0] + "%s, " * string_count + placeholderStr[1] 
     index = changing_query_string.rfind(",")
@@ -66,13 +73,12 @@ def creating_insert_string(string_count):
     final_string = str(changing_query_string[:index] + changing_query_string[index+1:]).format(specific_table)
     print('This is the query string', final_string)
 
-
     return final_string
 
 
 
 def insert_row_data(data):
-    '''Inserts rows of data into the specific table'''
+    '''Inserts rows of data into the specific table after creating the query string for specific table'''
     print('attempting to count columns')
     string_count=0
     columns = global_df.columns
@@ -103,14 +109,10 @@ def get_row_values():
 
     insert_row_data(data)
 
-# if file_key == 'Ben-Test/Sales-Parquet/currency/RunNum:331.parquet':   
+
 get_parquet_data(bucket_name=bucket_name, key=file_key)
-
 set_table_to_update()
-#get_parquet_data(bucket_name=bucket_name, key=file_key)
 get_row_values()
-
-
 
 
 
