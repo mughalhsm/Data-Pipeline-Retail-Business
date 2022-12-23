@@ -13,10 +13,16 @@ def create_buckets():
     code_bucket_name = f'{deploy_prefix}code-bucket'
     processed_bucket_name = f'{deploy_prefix}processed-bucket'
     ingest_bucket_name = f'{deploy_prefix}ingest-bucket'
+    
+    print("Creating buckets")
     create = Create_resources()
-    create.create_s3_bucket(code_bucket_name)
-    create.create_s3_bucket(processed_bucket_name)
-    create.create_s3_bucket(ingest_bucket_name)
+    response = create.create_s3_bucket(code_bucket_name)
+    print(f'Created code bucket with response {response}')
+    response = create.create_s3_bucket(processed_bucket_name)
+    print(f'Created processed bucket with response {response}')
+    response = create.create_s3_bucket(ingest_bucket_name)
+    print(f'Created ingest bucket with response {response}')
+    
     ingest_lambda_name = f"{deploy_prefix}ingest"
     process_payments_lambda_name = f"{deploy_prefix}process_payments"
     process_purchases_lambda_name = f"{deploy_prefix}process_purchases"
