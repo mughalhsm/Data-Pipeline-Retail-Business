@@ -9,6 +9,6 @@ def test_create_fact_purchase_order_table_correctly():
        'item_quantity', 'item_unit_price', 'currency_id',
        'agreed_delivery_date', 'agreed_payment_date',
        'agreed_delivery_location_id', 'created_date', 'created_time',
-       'last_updated_date', 'last_updated_time']
+       'last_updated_date', 'last_updated_time', 'purchase_record_id']
     assert column_names == expected_column_names
     assert len(fact_purchase_order_df.index) > 1
