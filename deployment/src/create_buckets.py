@@ -72,6 +72,7 @@ class Create_resources():
                 Bucket=bucket_name,
                 NotificationConfiguration=notification_config
             )
+            print(f"Put bucket notification response : {response}")
             return response
         except ClientError as ce:
             error = 'Client Error : ' + ce.response['Error']['Message']
