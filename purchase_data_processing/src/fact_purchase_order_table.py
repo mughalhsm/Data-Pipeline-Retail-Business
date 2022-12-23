@@ -9,6 +9,7 @@ def create_fact_purchase_orders_dataframe(purchase_order_df):
         purchase_order_df['last_updated_date'] = pd.to_datetime(purchase_order_df['last_updated']).dt.date
         purchase_order_df['last_updated_time'] = pd.to_datetime(purchase_order_df['last_updated']).dt.time
         purchase_order_df = purchase_order_df.drop(['created_at', 'last_updated'], axis=1)
+        purchase_order_df['purchase_record_id'] = ''
     except Exception as e:
         print(e)
         raise e
