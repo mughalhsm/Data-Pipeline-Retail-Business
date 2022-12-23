@@ -14,13 +14,13 @@ def test_get_run_num_correctly_gets_largest_run_num():
     test_file.write('test')
     conn = boto3.client('s3')
 
-    conn.create_bucket(Bucket='bosch-test-run-2-ingest-bucket')
+    conn.create_bucket(Bucket='bosch-deploy-23-12-22-ingest-bucket')
 
     for i in range(11):
-        conn.put_object(Body=test_file.getvalue(), Bucket='bosch-test-run-2-ingest-bucket', Key=f'Run-tracker/run-number{i}.csv')
+        conn.put_object(Body=test_file.getvalue(), Bucket='bosch-deploy-23-12-22-ingest-bucket', Key=f'Run-tracker/run-number{i}.csv')
     
     result = get_run_number()
-    print(conn.list_objects_v2(Bucket='bosch-test-run-2-ingest-bucket', Prefix='Run-tracker'))
+    print(conn.list_objects_v2(Bucket='bosch-deploy-23-12-22-ingest-bucket', Prefix='Run-tracker'))
     assert result == 10
 
 @mock_s3
@@ -29,7 +29,7 @@ def test_get_run_num_raises_error_if_no_runs_found():
     
     conn = boto3.client('s3')
 
-    conn.create_bucket(Bucket='bosch-test-run-2-ingest-bucket')
+    conn.create_bucket(Bucket='bosch-deploy-23-12-22-ingest-bucket')
 
     with pytest.raises(Exception):
         get_run_number()
@@ -46,8 +46,8 @@ def test_retrieve_ingested_correctly_retrieves_csv_data():
 
     conn = boto3.client('s3')
 
-    conn.create_bucket(Bucket='bosch-test-run-2-ingest-bucket')
-    conn.put_object(Body=test_csv.getvalue(),Bucket='bosch-test-run-2-ingest-bucket',Key='TableName/address/RunNum:4.csv')
+    conn.create_bucket(Bucket='bosch-deploy-23-12-22-ingest-bucket')
+    conn.put_object(Body=test_csv.getvalue(),Bucket='bosch-deploy-23-12-22-ingest-bucket',Key='TableName/address/RunNum:4.csv')
     result = retrieve_ingested_csv('address', 4)
 
     
@@ -64,8 +64,8 @@ def test_retrieve_ingested_correctly_returns_LookupError_if_given_invalid_table_
 
     conn = boto3.client('s3')
 
-    conn.create_bucket(Bucket='bosch-test-run-2-ingest-bucket')
-    conn.put_object(Body=test_csv.getvalue(),Bucket='bosch-test-run-2-ingest-bucket',Key='TableName/address/RunNum:4.csv')
+    conn.create_bucket(Bucket='bosch-deploy-23-12-22-ingest-bucket')
+    conn.put_object(Body=test_csv.getvalue(),Bucket='bosch-deploy-23-12-22-ingest-bucket',Key='TableName/address/RunNum:4.csv')
     with pytest.raises(LookupError):
         retrieve_ingested_csv('not_a_table',6)
 
@@ -78,8 +78,8 @@ def test_retrieve_ingested_correctly_returns_LookupError_if_given_invalid_run_nu
 
     conn = boto3.client('s3')
 
-    conn.create_bucket(Bucket='bosch-test-run-2-ingest-bucket')
-    conn.put_object(Body=test_csv.getvalue(),Bucket='bosch-test-run-2-ingest-bucket',Key='TableName/address/RunNum:4.csv')
+    conn.create_bucket(Bucket='bosch-deploy-23-12-22-ingest-bucket')
+    conn.put_object(Body=test_csv.getvalue(),Bucket='bosch-deploy-23-12-22-ingest-bucket',Key='TableName/address/RunNum:4.csv')
     with pytest.raises(LookupError):
         retrieve_ingested_csv('address','not a number')
  
@@ -341,17 +341,17 @@ def test_save_to_processed_sales_bucket():
     test_df = pd.DataFrame({'test_key':[1,2,3], 'test_key_2':[3,4,5]})
     
     conn = boto3.client('s3')
-    conn.create_bucket(Bucket='bosch-test-run-3-processed-bucket')
+    conn.create_bucket(Bucket='bosch-deploy-23-12-22-processed-bucket')
 
-    save_to_processed_sales_bucket('address', 11, test_df)
+    save_to_processed_sales_bucket('location', 11, test_df)
 
-    key = conn.list_objects_v2(Bucket='bosch-test-run-3-processed-bucket')['Contents'][0]['Key']
+    key = conn.list_objects_v2(Bucket='bosch-deploy-23-12-22-processed-bucket')['Contents'][0]['Key']
 
-    expected_key = 'Ben-Test/Sales-Parquet/address/RunNum:11.parquet'
+    expected_key = 'Sales/location/RunNum:11.parquet'
 
     result_data = BytesIO()
 
-    conn.download_fileobj('bosch-test-run-3-processed-bucket', 'Ben-Test/Sales-Parquet/address/RunNum:11.parquet', result_data)
+    conn.download_fileobj('bosch-deploy-23-12-22-processed-bucket', 'Sales/location/RunNum:11.parquet', result_data)
 
     uploaded_df = pd.read_parquet(result_data)
 
@@ -369,7 +369,7 @@ def test_save_to_processed_sales_bucket_raises_TypeError_if_passed_RunNum_is_not
     test_df = pd.DataFrame({'test_key':[1,2,3], 'test_key_2':[3,4,5]})
 
     with pytest.raises(TypeError):
-        save_to_processed_sales_bucket('address','NaN', test_df)
+        save_to_processed_sales_bucket('location','NaN', test_df)
 
 @mock_s3  
 def test_save_to_processed_sales_bucket_raises_LookupError_if_passed_invalid_table_name():
