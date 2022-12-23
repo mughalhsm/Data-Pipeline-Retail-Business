@@ -19,7 +19,7 @@ jobs:
           pip install pandas -t .
           pip install pg8000 -t .
           pip install fastparquet -t .
-          pip install psychopg2 -binary -t .
+          pip install psychopg2-binary -t .
           CURRENTLOC=$(pwd)
           ls -la
           echo Zipping dependencies
