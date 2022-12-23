@@ -19,7 +19,7 @@ jobs:
           pip install pandas -t .
           pip install pg8000 -t .
           pip install fastparquet -t .
-          pip install psychopg2-binary -t .
+          # pip install psychopg2 -t .
           CURRENTLOC=$(pwd)
           ls -la
           echo Zipping dependencies
@@ -31,8 +31,8 @@ jobs:
           zip -r9 ${CURRENTLOC}/fastparquet.zip fastparquet
           echo Zipping pandas and fastparquet together
           zip -j fastpandas.zip pandas.zip fastparquet.zip
-          echo Zipping from $(pwd) to $(${CURRENTLOC}/psychopg2.zip)
-          zip -r9 ${CURRENTLOC}/psychopg2.zip psychopg2
+          # echo Zipping from $(pwd) to $(${CURRENTLOC}/psychopg2.zip)
+          # zip -r9 ${CURRENTLOC}/psychopg2.zip psychopg2
           # -r deployment/requirements.txt
           # pip install -e .
       - name: Execute python script to create buckets on the s3 aws server
