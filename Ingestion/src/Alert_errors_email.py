@@ -6,7 +6,7 @@ import os
 # Create a metric filter that spots the "ERROR" event
 def put_metric_filter_func(logGroupName, filterName, filterPattern, metricTransformations):
     """Attempts to put metric filter after verifiying that log group exists"""
-    cloudwatch_logs = boto3.client("logs")
+    cloudwatch_logs = boto3.client("logs",region_name='us-east-1')
     try:
         print('checking if log group exists')
         log_describe_response = cloudwatch_logs.describe_log_groups()
@@ -36,7 +36,7 @@ def put_metric_filter_func(logGroupName, filterName, filterPattern, metricTransf
 
 ###Creating a topic and subscribing to it 
 def create_sns_topic():
-    sns = boto3.client("sns")
+    sns = boto3.client("sns",region_name='us-east-1')
     try:
         print('trying to create sns topic')
         create_response = sns.create_topic(
@@ -52,7 +52,7 @@ def create_sns_topic():
 
 
 def subscribe_by_email(createdErr_topic_arn):
-    sns = boto3.client("sns")
+    sns = boto3.client("sns",region_name='us-east-1')
     try:
         print('trying to subscribe to email')
         sub_response = sns.subscribe(
@@ -69,7 +69,7 @@ def subscribe_by_email(createdErr_topic_arn):
 ##Adds metric alarm, testing against the 1 given by the filter, if >= then 
 ##alarmactions = topic_arn which sends me an email
 def put_metric_alarm(createdErr_topic_arn):
-    cloudwatch = boto3.client('cloudwatch')
+    cloudwatch = boto3.client('cloudwatch',region_name='us-east-1')
     try:
         print('trying to put metric alarm')
         metric_alarm_response = cloudwatch.put_metric_alarm(
@@ -91,7 +91,7 @@ def put_metric_alarm(createdErr_topic_arn):
 
 
 def sub_list():
-    sns = boto3.client("sns")
+    sns = boto3.client("sns",region_name='us-east-1')
     try:
         print('showing subscribers')
         subscriber_list=sns.list_subscriptions()
