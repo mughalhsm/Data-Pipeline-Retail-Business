@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 def get_run_number():
     try:
         s3 = boto3.client('s3')
-        run_num_dict = s3.list_objects_v2(Bucket='bosch-test-run-2-ingest-bucket', Prefix='Run-tracker')['Contents']
+        run_num_dict = s3.list_objects_v2(Bucket='bosch-deploy-23-12-22-ingest-bucket', Prefix='Run-tracker')['Contents']
         run_num_dict = run_num_dict[1:]
 
         run_num_list = [int(run['Key'][22:len(run['Key'])-4]) for run in run_num_dict]
@@ -36,7 +36,7 @@ def retrieve_ingested_csv(table_name, run_number):
         
         file_key = f'TableName/{table_name}/RunNum:{run_number}.csv'
 
-        file = s3.get_object(Bucket='bosch-test-run-2-ingest-bucket', Key=file_key)['Body'].read().decode()
+        file = s3.get_object(Bucket='bosch-deploy-23-12-22-ingest-bucket', Key=file_key)['Body'].read().decode()
         return file
 
     except LookupError:
@@ -261,7 +261,7 @@ def save_to_processed_sales_bucket_as_csv(table_name, run_num, dataframe):
         csv_buffer = StringIO()
         dataframe.to_csv(csv_buffer)
 
-        s3.put_object(Body=csv_buffer.getvalue(), Bucket='bosch-test-run-2-processed-bucket', Key=f'Ben-Test/Sales/{table_name}/RunNum:{run_num}.csv')
+        s3.put_object(Body=csv_buffer.getvalue(), Bucket='bosch-deploy-23-12-22-processed-bucket', Key=f'Ben-Test/Sales/{table_name}/RunNum:{run_num}.csv')
 
         print(f'{table_name},{run_num} Saved!')
     except TypeError:
@@ -287,7 +287,7 @@ def save_to_processed_sales_bucket(table_name, run_num, dataframe):
         parquet_buffer = BytesIO()
         dataframe.to_parquet(parquet_buffer)
 
-        s3.put_object(Body=parquet_buffer.getvalue(), Bucket='bosch-test-run-3-processed-bucket', Key=f'Ben-Test/Sales-Parquet/{table_name}/RunNum:{run_num}.parquet')
+        s3.put_object(Body=parquet_buffer.getvalue(), Bucket='bosch-deploy-23-12-22-processed-bucket', Key=f'Sales/{table_name}/RunNum:{run_num}.parquet')
 
         print(f'{table_name},{run_num} Saved!')
     except TypeError:
