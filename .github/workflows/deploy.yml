@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - lambda-layers
+      - apply-specific-deployment-details
 
 jobs:
   create-buckets-and-lambdas:

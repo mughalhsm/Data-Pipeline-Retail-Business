@@ -27,6 +27,7 @@ processed_bucket_name = f'{deploy_prefix}processed-bucket'
 ingest_bucket_name = f'{deploy_prefix}ingest-bucket'
 code_bucket_name = f'{deploy_prefix}code-bucket'
 
+
 def deploy_lambdas():
     permit = Assign_iam()
     print("Creating policies")
@@ -36,12 +37,15 @@ def deploy_lambdas():
     deploy = Deploy_lambdas()
     print("Creating lambda layers")
     try:
-        deploy.create_lambda_layer(layer_name="pandas-layer",zipfile="pandas.zip",description="Layer for pandas dependency")
-        deploy.create_lambda_layer(layer_name="pg8000-layer",zipfile="pg8000.zip",description="Layer for pg8000 dependency")
-    except :
+        deploy.create_lambda_layer(
+            layer_name="pandas-layer", zipfile="pandas.zip", description="Layer for pandas dependency")
+        deploy.create_lambda_layer(
+            layer_name="pg8000-layer", zipfile="pg8000.zip", description="Layer for pg8000 dependency")
+    except:
         print("Failed on lambda layers")
     print("Creating ingest lambda")
-    create_lambdas(permit, deploy, ingest_lambda_name, ingest_role,ingest_handler_name)
+    create_lambdas(permit, deploy, ingest_lambda_name,
+                   ingest_role, ingest_handler_name)
     print("Creating process payments lambda")
     create_lambdas(permit, deploy, process_payments_lambda_name,
                    process_payments_role, process_payments_handler_name)
@@ -52,23 +56,27 @@ def deploy_lambdas():
     create_lambdas(permit, deploy, process_sales_lambda_name,
                    process_sales_role, process_sales_handler_name)
     print("Creating warehouse uploader lambda")
-    create_lambdas(permit, deploy, upload_lambda_name, warehouse_uploader_role, upload_handler_name)
+    create_lambdas(permit, deploy, upload_lambda_name,
+                   warehouse_uploader_role, upload_handler_name)
     create = Create_resources()
 
     print("Assigning triggers to ingest bucket")
-    print(process_payments_lambda_name, process_payments_lambda_name in deploy.lambda_arns)
+    print(process_payments_lambda_name,
+          process_payments_lambda_name in deploy.lambda_arns)
     if process_payments_lambda_name in deploy.lambda_arns:
         create.assign_bucket_update_event_triggers(
             bucket_name=ingest_bucket_name, lambda_arn=deploy.lambda_arns[process_payments_lambda_name], bucket_folders=['TableName/'])
-    print(process_purchases_lambda_name, process_purchases_lambda_name in deploy.lambda_arns)
+    print(process_purchases_lambda_name,
+          process_purchases_lambda_name in deploy.lambda_arns)
     if process_purchases_lambda_name in deploy.lambda_arns:
         create.assign_bucket_update_event_triggers(
             bucket_name=ingest_bucket_name, lambda_arn=deploy.lambda_arns[process_purchases_lambda_name], bucket_folders=['TableName/'])
-    print(process_sales_lambda_name,process_sales_lambda_name in deploy.lambda_arns)
+    print(process_sales_lambda_name,
+          process_sales_lambda_name in deploy.lambda_arns)
     if process_sales_lambda_name in deploy.lambda_arns:
         create.assign_bucket_update_event_triggers(
             bucket_name=ingest_bucket_name, lambda_arn=deploy.lambda_arns[process_sales_lambda_name], bucket_folders=['TableName/'])
-    print(upload_lambda_name,upload_lambda_name in deploy.lambda_arns)
+    print(upload_lambda_name, upload_lambda_name in deploy.lambda_arns)
     if upload_lambda_name in deploy.lambda_arns:
         create.assign_bucket_update_event_triggers(
             bucket_name=processed_bucket_name, lambda_arn=deploy.lambda_arns[upload_lambda_name], bucket_folders=[''])
@@ -77,17 +85,17 @@ def deploy_lambdas():
     event.create_schedule_event(f'schedule-event-{ingest_lambda_name}', '5')
     lambda_arn = deploy.lambda_arns[ingest_lambda_name]
     response = event.assign_event_target(
-            schedule_name=f'schedule-event-{ingest_lambda_name}', target_arn=lambda_arn)
+        schedule_name=f'schedule-event-{ingest_lambda_name}', target_arn=lambda_arn)
     print("Assigning ingest period result : ", response)
 
 
-def create_lambdas(permit: Assign_iam, deploy: Deploy_lambdas, lambda_name:str, role_name:str, handler_method:str):
-    if handler_method == "": 
+def create_lambdas(permit: Assign_iam, deploy: Deploy_lambdas, lambda_name: str, role_name: str, handler_method: str):
+    if handler_method == "":
         print("No handler found")
         return
-    print("Create lambda using :",lambda_name,role_name,handler_method)
+    print("Create lambda using :", lambda_name, role_name, handler_method)
     deploy.create_lambda(lambda_name=lambda_name, code_bucket=code_bucket_name,
-                         role_arn=permit.role_arns[role_name], zip_file=f'{lambda_name}.zip',handler_name=handler_method)
+                         role_arn=permit.role_arns[role_name], zip_file=f'{lambda_name}.zip', handler_name=handler_method)
 
 
 def create_roles(permit: Assign_iam):
