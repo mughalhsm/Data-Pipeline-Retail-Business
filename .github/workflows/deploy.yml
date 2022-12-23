@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - apply-specific-deployment-details
+      - permissions-resolving
 
 jobs:
   create-buckets-and-lambdas:
