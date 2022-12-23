@@ -43,13 +43,15 @@ class Assign_iam():
                 responses = self.iam.list_roles()
                 response = {'Role':role for role in responses['Roles'] if role_name == role['RoleName']}
         attempt = 0
-        while response['Role']['RoleName'] != role_name and attempt < 10:
+        while ('Role' not in response or 'RoleName' not in response['Role'] or response['Role']['RoleName'] != role_name) and attempt < 10:
             time.sleep(1)
             responses = self.iam.list_roles()
             response = {'Role':role for role in responses['Roles'] if role_name == role['RoleName']}
             attempt+=1
-        
-        self.role_arns[role_name] = response['Role']['Arn']
+        try:
+            self.role_arns[role_name] = response['Role']['Arn']
+        except TypeError as te:
+            f"Failed to get role appropriately, recieved {response}"
         return response
     def verify_stored_arns(self):
         return
