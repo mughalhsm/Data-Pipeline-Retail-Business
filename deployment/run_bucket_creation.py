@@ -33,6 +33,7 @@ def create_buckets():
     process_prerequisite = "fastpandas.zip"
     output_prerequisite = "pg8000.zip" #"psychopg2.zip"
     
+
     print('uploading lambdas where valid')
     if ingest_lambda_path != "":
         create.upload_lambda_function_code(

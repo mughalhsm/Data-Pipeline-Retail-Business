@@ -26,8 +26,9 @@ def test_create_role_of_passed_name():
     
     permissions = Assign_iam()
     result = permissions.create_lambda_role("test_role")
+    print(result['Role']['AssumeRolePolicyDocument'])
     assert "Arn" in result['Role']
-    assert result['Role']['AssumeRolePolicyDocument'] == {'Statement': [{'Action': 'sts:AssumeRole', 'Effect': 'Allow', 'Principal': {'Service': 'lambda.amazonaws.com'}}, {'Action': ['iam:PassRole'], 'Effect': 'Allow', 'Resource': ['arn:aws:iam:::*']}], 'Version': '2012-10-17'}
+    assert result['Role']['AssumeRolePolicyDocument'] == {'Version': '2012-10-17', 'Statement': [{'Effect': 'Allow', 'Principal': {'Service': 'lambda.amazonaws.com'}, 'Action': 'sts:AssumeRole'}]}#{'Statement': [{'Action': 'sts:AssumeRole', 'Effect': 'Allow', 'Principal': {'Service': 'lambda.amazonaws.com'}}, {'Action': ['iam:PassRole'], 'Effect': 'Allow', 'Resource': ['arn:aws:iam:::*']}], 'Version': '2012-10-17'}
 
 @mock_iam
 def test_attach_execution_policy_to_role_of_passed_name():    

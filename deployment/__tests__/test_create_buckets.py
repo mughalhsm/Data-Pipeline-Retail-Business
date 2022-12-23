@@ -149,7 +149,7 @@ def test_assign_bucket_update_event_triggers_runs_associated_lambda_when_bucket_
     permit.attach_custom_policy(role_name='test-role',policy='cloudwatch-policy-customLambda')
     deploy = Deploy_lambdas()
     role_arn = permit.role_arns['test-role']
-    deploy.create_lambda(lambda_name="customLambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip")
+    deploy.create_lambda(lambda_name="customLambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip",handler_name="lambda_handler")
     response = create.assign_bucket_update_event_triggers(
         bucket_name='ingest-bucket',
         lambda_arn=deploy.lambda_arns['customLambda'],
