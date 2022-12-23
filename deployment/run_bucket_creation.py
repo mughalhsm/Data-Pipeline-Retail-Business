@@ -8,7 +8,7 @@ def create_buckets():
     ingest_lambda_path = "Ingestion/src"
     process_payments_lambda_path = ""
     process_purchases_lambda_path = "purchase_data_processing/src"
-    process_sales_lambda_path = ""
+    process_sales_lambda_path = "process_sales_src"
     warehouse_uploader_lambda_path = ""
     code_bucket_name = f'{deploy_prefix}code-bucket'
     processed_bucket_name = f'{deploy_prefix}processed-bucket'
@@ -25,7 +25,7 @@ def create_buckets():
     
     ingest_prerequisite = "pg8000.zip"
     process_prerequisite = "fastpandas.zip"
-    output_prerequisite = "pg8000.zip"
+    output_prerequisite = "psychopg2.zip"
     
     if ingest_lambda_path != "":
         create.upload_lambda_function_code(
