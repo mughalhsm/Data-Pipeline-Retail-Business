@@ -9,7 +9,7 @@ def create_buckets():
     process_payments_lambda_path = ""
     process_purchases_lambda_path = "purchase_data_processing/src"
     process_sales_lambda_path = "process_sales_src"
-    warehouse_uploader_lambda_path = ""
+    warehouse_uploader_lambda_path = "Uploading/"
     code_bucket_name = f'{deploy_prefix}code-bucket'
     processed_bucket_name = f'{deploy_prefix}processed-bucket'
     ingest_bucket_name = f'{deploy_prefix}ingest-bucket'

@@ -9,7 +9,7 @@ ingest_handler_name = f"my_handler"
 process_payments_handler_name = ""
 process_purchases_handler_name = "lambda_handler"
 process_sales_handler_name = ""
-upload_handler_name = ""
+upload_handler_name = "lambda_handler"
 
 ingest_lambda_name = f"{deploy_prefix}ingest"
 process_payments_lambda_name = f"{deploy_prefix}process_payments"
