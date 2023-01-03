@@ -44,7 +44,7 @@ def test_assign_event_taget_gives_passed_lambda_scheduler_rule():
     permit.attach_custom_policy(role_name='test-role',policy='cloudwatch-policy-customLambda')
     deploy = Deploy_lambdas()
     role_arn = permit.role_arns['test-role']
-    deploy.create_lambda(lambda_name="customLambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip")
+    deploy.create_lambda(lambda_name="customLambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip",handler_name="lambda_handler")
     event = Create_events()
     event.create_schedule_event(schedule_name="test-schedule",minute_count=1)
     lambda_arn = deploy.lambda_arns['customLambda']

@@ -2,7 +2,6 @@ on:
   push:
     branches:
       - main
-      - github-actions-deploy-branch
 
 jobs:
   create-buckets-and-lambdas:
@@ -16,13 +15,32 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install boto3
-          pip install pandas
+          pip install pandas -t .
+          pip install pg8000 -t .
+          pip install fastparquet -t .
+          # pip install psychopg2 -t .
+          CURRENTLOC=$(pwd)
+          ls -la
+          echo Zipping dependencies
+          echo Zipping from $(pwd) to $(${CURRENTLOC}/pandas.zip)
+          zip -r9 ${CURRENTLOC}/pandas.zip pandas
+          echo Zipping from $(pwd) to $(${CURRENTLOC}/pg8000.zip)
+          zip -r9 ${CURRENTLOC}/pg8000.zip pg8000
+          echo Zipping from $(pwd) to $(${CURRENTLOC}/fastparquet.zip)
+          zip -r9 ${CURRENTLOC}/fastparquet.zip fastparquet
+          echo Zipping pandas and fastparquet together
+          zip -j fastpandas.zip pandas.zip fastparquet.zip
+          # echo Zipping from $(pwd) to $(${CURRENTLOC}/psychopg2.zip)
+          # zip -r9 ${CURRENTLOC}/psychopg2.zip psychopg2
           # -r deployment/requirements.txt
           # pip install -e .
       - name: Execute python script to create buckets on the s3 aws server
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
         run: |
           echo 'Creating buckets'
-          python deployment/run_bucket_creation.py
+          PYTHONPATH=$(pwd) python deployment/run_bucket_creation.py
       # - name: Initial test run
       #   run : python -m pytest --import-mode=append
       # - name: Run tests to ensure lambdas pass
@@ -30,11 +48,19 @@ jobs:
       #     FAILCOUNT=$(PYTHONPATH=$(pwd) pytest | grep failed -i | wc -l)
       #     echo lambdas failed $FAILCOUT times
       - name: Use the uploaded lambda zip archives to populate the lambda functions
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
         run: |
           # if [ $FAILCOUNT -le 0 ]; then
           #   echo 'Assigning lambdas roles and functions'
-            python deployment/run_lambda_creation.py
+            PYTHONPATH=$(pwd) python deployment/run_lambda_creation.py
           # else 
           #   echo "Lambdas not assigned due to errors";
           #   PYTHONPATH=$(pwd) pytest -v | grep FAILED
           # fi
+      - name: Apply alarms
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        run: PYTHONPATH=$(pwd) python Ingestion/src/Alert_errors_email.py

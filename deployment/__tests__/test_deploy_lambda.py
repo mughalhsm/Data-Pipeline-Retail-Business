@@ -19,7 +19,14 @@ def test_create_lambda_successfully_deploys_when_zip_is_available():
     permit.attach_custom_policy(role_name='test-role',policy='cloudwatch-policy-test-lambda')
     role_arn = permit.role_arns['test-role']
     deploy = Deploy_lambdas()
-    result = deploy.create_lambda(lambda_name="test-lambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip")
+    result = deploy.create_lambda(lambda_name="test-lambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip",handler_name="lambda_handler")
     assert result['ResponseMetadata']['HTTPStatusCode'] == 201
     assert result['FunctionName'] == 'test-lambda'
     assert 'FunctionArn' in result
+
+@mock_lambda
+def test_create_lambda_layer():
+    deploy = Deploy_lambdas()
+    response = deploy.create_lambda_layer(layer_name="pandas-layer",zipfile="pandas.zip",description="test pandas")
+    print(response)
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 201

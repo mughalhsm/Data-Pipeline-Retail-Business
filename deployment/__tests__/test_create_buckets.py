@@ -106,6 +106,7 @@ def test_directory_zipped_for_lambda_use_is_replaced_upon_new_zip():
     for file in files:
         assert file not in ['src/controller.py', 'src/method.py']
 
+@pytest.mark.skip("Zip nolonger handles pandas")
 def test_zip_directory_includes_pandas_zipped_if_dependency_exists():
     zip_directory('deployment/__tests__/test_data/lambda1', pandas_dependency=True)
     assert os.path.exists("lambda.zip")
@@ -148,7 +149,7 @@ def test_assign_bucket_update_event_triggers_runs_associated_lambda_when_bucket_
     permit.attach_custom_policy(role_name='test-role',policy='cloudwatch-policy-customLambda')
     deploy = Deploy_lambdas()
     role_arn = permit.role_arns['test-role']
-    deploy.create_lambda(lambda_name="customLambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip")
+    deploy.create_lambda(lambda_name="customLambda",code_bucket="code-bucket",role_arn=role_arn,zip_file="customLambda.zip",handler_name="lambda_handler")
     response = create.assign_bucket_update_event_triggers(
         bucket_name='ingest-bucket',
         lambda_arn=deploy.lambda_arns['customLambda'],
