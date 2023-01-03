@@ -39,6 +39,8 @@ class Create_resources():
             error = 'Client Error : ' + ce.response['Error']['Message']
             print(error)
             self.errors.append(error)
+            if ce.response['Error']['Message'] == "The AWS Access Key Id you provided does not exist in our records.":
+                raise ce
 
     def assign_bucket_update_event_triggers(self, bucket_name: str, lambda_arn: str, bucket_folders: list):
         """Trigger the appropriate lambda function when a bucket folder has new files added"""
@@ -79,7 +81,7 @@ class Create_resources():
             print(error)
             self.errors.append(error)
             if ce.response['Error']['Code'] == "InvalidArgument":
-                print("Invalid argument error - likely permissions incompletely setup")
+                print("Invalid argument error - ensure permissions are correctly setup")
 
     def upload_lambda_function_code(self, folder_path: str, code_bucket: str, lambda_name: str='lambda', prerequisite_zip:str=None):
         """Using a folder path, lambda name, and destination code bucket, zip the lambda into an archive and upload it to aws s3 bucket"""
