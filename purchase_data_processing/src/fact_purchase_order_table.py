@@ -2,6 +2,7 @@ import pandas as pd
 
 def create_fact_purchase_orders_dataframe(purchase_order_df):
     try:
+        # If 'purchase_order_id' not in table - raise KeyError
         if "purchase_order_id" not in purchase_order_df.columns:
             raise KeyError
         purchase_order_df['created_date'] = pd.to_datetime(purchase_order_df['created_at']).dt.date
