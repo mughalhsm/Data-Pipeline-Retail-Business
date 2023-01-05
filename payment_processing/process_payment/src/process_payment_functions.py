@@ -439,7 +439,7 @@ def date_files_processed_list(s3_processed_bucket_name = access_bucket()[2]):
 
 # fact_payment
 def fact_payment_tables(s3_processed_bucket_name = access_bucket()[2],
-                        processed_count = payment_files_processed_list(), #should be [0] but testing doesn't like it for some reason
+                        processed_count = payment_files_processed_list()[0], # remove [0] for testing
                         df_list_payment = df_list_payment()):
 
     s3_client = boto3.client("s3")
@@ -469,7 +469,7 @@ def fact_payment_tables(s3_processed_bucket_name = access_bucket()[2],
 
 # dim_payment_type
 def dim_payment_type_tables(s3_processed_bucket_name = access_bucket()[2],
-                                processed_count = payment_type_files_processed_list(), #should be [0] but testing doesn't like it for some reason
+                                processed_count = payment_type_files_processed_list()[0], # remove [0] for testing
                                 df_list_payment_type = df_list_payment_type()):
 
     s3_client = boto3.client("s3")
@@ -492,7 +492,7 @@ def dim_payment_type_tables(s3_processed_bucket_name = access_bucket()[2],
 
 # dim_transaction
 def dim_transaction_tables(s3_processed_bucket_name = access_bucket()[2],
-                            processed_count = transaction_files_processed_list(), #should be [0] but testing doesn't like it for some reason
+                            processed_count = transaction_files_processed_list()[0], # remove [0] for testing
                             df_list_transaction = df_list_transaction()):
 
     s3_client = boto3.client("s3")
@@ -517,7 +517,7 @@ def dim_transaction_tables(s3_processed_bucket_name = access_bucket()[2],
 
 # dim_currency
 def dim_currency_tables(s3_processed_bucket_name = access_bucket()[2],
-                        processed_count = currency_files_processed_list(), #should be [0] but testing doesn't like it for some reason
+                        processed_count = currency_files_processed_list()[0], # remove [0] for testing
                         df_list_currency = df_list_currency()):
 
     s3_client = boto3.client("s3")
@@ -542,7 +542,7 @@ def dim_currency_tables(s3_processed_bucket_name = access_bucket()[2],
 
 # dim_counterparty
 def dim_counterparty_tables(s3_processed_bucket_name = access_bucket()[2],
-                            processed_count = counterparty_files_processed_list(), #should be [0] but testing doesn't like it for some reason
+                            processed_count = counterparty_files_processed_list()[0], # remove [0] for testing
                             df_list_counterparty = df_list_counterparty(),
                             df_list_address = df_list_address()):
 
@@ -583,7 +583,7 @@ def dim_counterparty_tables(s3_processed_bucket_name = access_bucket()[2],
 
 # dim_date
 def dim_date_tables(s3_processed_bucket_name = access_bucket()[2],
-                    processed_count = date_files_processed_list(), #should be [0] but testing doesn't like it for some reason
+                    processed_count = date_files_processed_list()[0], # remove [0] for testing
                     df_list_payment = df_list_payment()):
 
     s3_client = boto3.client("s3")
