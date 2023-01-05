@@ -6,7 +6,7 @@ deploy_prefix = "bosch-deploy-23-12-22-v2-"
 
 def create_buckets():
     ingest_lambda_path = "Ingestion/src"
-    process_payments_lambda_path = ""
+    process_payments_lambda_path = "payment_processing/process_payment/src"
     process_purchases_lambda_path = "purchase_data_processing/src"
     process_sales_lambda_path = "process_sales_src"
     warehouse_uploader_lambda_path = "Uploading/"

@@ -6,9 +6,9 @@ from deployment.src.event_handler import Create_events
 deploy_prefix = "bosch-deploy-23-12-22-v2-"
 
 ingest_handler_name = f"my_handler"
-process_payments_handler_name = ""
+process_payments_handler_name = "payment_lambda_handler"
 process_purchases_handler_name = "lambda_handler"
-process_sales_handler_name = ""
+process_sales_handler_name = "sales_handler"
 upload_handler_name = "lambda_handler"
 
 ingest_lambda_name = f"{deploy_prefix}ingest"
