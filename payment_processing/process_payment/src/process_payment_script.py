@@ -18,10 +18,10 @@ from process_payment.src.process_payment_functions import (access_bucket,
  dim_transaction_tables, dim_currency_tables, dim_counterparty_tables, 
  dim_date_tables)
 
-
-fact_payment_tables()
-dim_payment_type_tables()
-dim_transaction_tables()
-dim_currency_tables()
-dim_counterparty_tables()
-dim_date_tables()
+def payment_lambda_handler(events, context):
+    fact_payment_tables()
+    dim_payment_type_tables()
+    dim_transaction_tables()
+    dim_currency_tables()
+    dim_counterparty_tables()
+    dim_date_tables()
