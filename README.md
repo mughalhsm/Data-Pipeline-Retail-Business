@@ -66,6 +66,3 @@ The list of tables in the complete warehouse is:
 |dim_currency|
 |dim_counterparty|
 
-The structure of your "processed" S3 data should reflect these tables.
-
-Note that data types in some columns may have to be changed...
