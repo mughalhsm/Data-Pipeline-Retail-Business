@@ -15,7 +15,7 @@ All Python code thoroughly tested.
 
 Deployed via a scripted solution written in Python.
 
-You should be able to demonstrate that a change to the source database will be reflected in the data warehouse within 30 minutes at most.
+A change to the source database will be reflected in the data warehouse within 30 minutes at most.
 
 ## Technical Details
 The primary data source for the project is a moderately complex database called `totesys` which is meant to simulate the back end data of a commercial application. Data is inserted and updated into this database several times a day.
