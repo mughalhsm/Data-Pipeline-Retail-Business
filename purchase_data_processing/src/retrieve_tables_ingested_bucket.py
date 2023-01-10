@@ -7,6 +7,7 @@ from io import StringIO
 
 
 def retrieve_table_from_s3_bucket_convert_dataframe(bucket_name, table_name):
+    ## Ensuring arguement for table name for purchases always equals 'purchase_order' as per table name in S3 bucket. 
     if table_name == 'purchase order' or table_name == 'purchases' or table_name == 'purchase':
         table_name = 'purchase_order'
     try:
